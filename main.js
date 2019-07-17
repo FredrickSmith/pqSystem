@@ -1,10 +1,10 @@
 
-const pqCommand = require ('pqCommand')
-const pqEvent   = require ('pqEvent'  )
+const pqCommand = require ('./pqCommand')
+const pqEvent   = require ('./pqEvent'  )
 
-const pqModule = require ('pqModule')
-	const pqDiscord    = require ('pqDiscord'   )
-	const pqTeamspeak3 = require ('pqTeamSpeak3')
+const pqModule = require ('./pqModule')
+	const pqDiscord    = require ('./pqDiscord'   )
+	const pqTeamspeak3 = require ('./pqTeamSpeak3')
 
 let pqModuleManager = new pqModule ('pq Management System')
 	pqModuleManager.Module ('Base', 'Command', pqCommand)

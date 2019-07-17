@@ -3,7 +3,7 @@ const fs      = require ('fs'        )
 const F       = require ('sprintf-js').sprintf
 const discord = require ('discord.js')
 
-const pqID = require ('pqID')
+const pqID = require ('./pqID.js')
 
 class pqDiscord {
 	constructor (command, event) {
@@ -11,9 +11,9 @@ class pqDiscord {
 		this.__e = event
 
 		this.__p = {
-			'600261179826503680': 2, // pq
-			'599877756834152450': 4, // officer
-			'600261181214818305': 8, // zarp
+			'600261179826503680': 1, // pq
+			'599877756834152450': 2, // officer
+			'600261181214818305': 4, // zarp
 		}
 	}
 
@@ -22,12 +22,11 @@ class pqDiscord {
 
 		client.roles.forEach (role => {num = num | (this.__p [role.id] || 0)})
 
-		return num | 16
+		return num | 8
 	}
 
-	addcommands (client) {
+	addcommands (client, resolve, reject) {
 		const command = this.__c
-		const id      = new pqID ()
 
 		let channel = client.channels.last ()
 
@@ -38,46 +37,26 @@ class pqDiscord {
 			}
 		})
 
-		command.addcommand ('discord', 'id'   , false, 'give me id', 2,
-			msg => {
-				return channel.send (id.id    ())
-					.then  (()=>{})
-					.catch (()=>{})
-			},
-			msg => {
-				return channel.send (F ('%s : No permission.', F ('<@%s>', msg.author.id)))
-					.then  (()=>{})
-					.catch (()=>{})
-			}
-		)
-		command.addcommand ('discord', 'token', false, 'give me token', 2,
-			msg => {
-				return channel.send (id.token ())
-					.then  (()=>{})
-					.catch (()=>{})
-			},
-			msg => {
-				return channel.send (F ('%s : No permission.', F ('<@%s>', msg.author.id)))
-					.then  (()=>{})
-					.catch (()=>{})
-			}
-		)
-		command.addcommand ('discord', 'help', ['h'], 'help please', 16,
-			msg => {
-				let commands = command.commands
+		const send   = (str, thn = ()=>{}, cth = ()=>{}) => {
+			return channel.send (str)
+				.then  (thn)
+				.catch (cth)
+		}
+		const noperm = msg => {
+			return send (F ('%s : No permission.', F ('<@%s>', msg.author.id)))
+		}
 
-				let str = '```lua\npq\n'
-				for (let cmd in commands) {
-					cmd = commands [cmd]
-					str += F ('!%s {%s}:\n\t%s\n', cmd.name, cmd.aliases.join (), cmd.description)
-				}
-				str += '\n```'
+		fs.readdir ('./commands', 'utf8', (err, str) => { // hot loading oh boy
+			if (err)
+				return console.log ('discord no commands')
 
-				return channel.send (str)
-					.then  (()=>{})
-					.catch (()=>{})
-			}, msg => {}
-		)
+			str.forEach (file => {
+				const filename = F ('./commands/%s', file)
+
+				delete require.cache [require.resolve (filename)]
+				require (filename) (client, channel, resolve, reject, command, send, noperm, F, pqID) // how the fuck do we env values
+			})
+		})
 	}
 
 	addevents (client) {
@@ -89,8 +68,8 @@ class pqDiscord {
 			this._c = new discord.Client ()
 
 			this._c.on ('ready', () => {
-				this.addcommands (this._c)
-				this.addevents   (this._c)
+				this.addcommands (this._c, resolve, reject)
+				this.addevents   (this._c, resolve, reject)
 				console.log (F ('discord ready %s', this._c.user.username))
 			})
 
@@ -117,12 +96,18 @@ class pqDiscord {
 		})
 		.then (reason => {
 			console.log (F ('discord finished with `%s`', reason))
+
+			this._c.destroy ()
+
+			if (reason == 'reload') this.start ()
 		})
 		.catch (reason => {
 			console.log (F ('discord finished with `%s`', reason))
 
+			this._c.destroy ()
+
 			if (reason == 'no login') this.start ()
-			if (reason == 'restart' ) this.start ()
+			if (reason == 'reload'  ) this.start ()
 		})
 	}
 }
