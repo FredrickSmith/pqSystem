@@ -11,9 +11,9 @@ class pqDiscord {
 		this.__e = event
 
 		this.__p = {
-			'600261179826503680': 1, // pq
-			'599877756834152450': 2, // officer
-			'600261181214818305': 4, // zarp
+			'600261179826503680': 14, // pq
+			'599877756834152450': 12, // officer
+			'600261181214818305': 0 , // zarp
 		}
 	}
 
@@ -22,7 +22,7 @@ class pqDiscord {
 
 		client.roles.forEach (role => {num = num | (this.__p [role.id] || 0)})
 
-		return num | 8
+		return num | 1
 	}
 
 	addcommands (client, resolve, reject) {
@@ -54,7 +54,17 @@ class pqDiscord {
 				const filename = F ('./commands/%s', file)
 
 				delete require.cache [require.resolve (filename)]
-				require (filename) (client, channel, resolve, reject, command, send, noperm, F, pqID) // how the fuck do we env values
+				require (filename) ({
+					client : client,
+					channel: channel,
+					resolve: resolve,
+					reject : reject,
+					command: command,
+					send   : send,
+					noperm : noperm,
+					F      : F,
+					pqID   : pqID,
+				}) // env ? better ?
 			})
 		})
 	}

@@ -1,6 +1,11 @@
 
-module.exports = (client, channel, resolve, reject, command, send, noperm, F, pqID) => {
-	command.addcommand ('discord', 'reload', ['Reload', 'r'], 'Reloads the bot', 1,
+module.exports = (env) => {
+	const resolve = env.resolve
+	const command = env.command
+	const send    = env.send
+	const noperm  = env.noperm
+
+	command.addcommand ('discord', 'reload', ['Reload', 'r'], 'Reloads the bot', 2,
 		msg => {
 			return send ('ok reloading', ()=>{resolve ('reload')}, ()=>{resolve ('reload')})
 		}, noperm
