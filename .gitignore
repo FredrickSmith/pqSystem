@@ -3,6 +3,7 @@
 node_modules
 
 discord.token
+discord.permission
 
 package-lock.json
 

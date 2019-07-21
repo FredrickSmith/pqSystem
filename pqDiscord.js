@@ -7,14 +7,11 @@ const pqID = require ('./pqID.js')
 
 class pqDiscord {
 	constructor (env) {
-		this.__c = env.Command
-		this.__e = env.Event
+		this._command  = env.Command
+		this._event  = env.Event
+		this._permloader = env.PermissionLoader
 
-		this.__p = {
-			'600261179826503680': 14, // pq
-			'599877756834152450': 12, // officer
-			'600261181214818305': 0 , // zarp
-		}
+		this.permissions = this._permloader.loadfile ('./discord.permission')
 
 		return this
 	}
@@ -22,13 +19,13 @@ class pqDiscord {
 	permission (client) {
 		let num = 0
 
-		client.roles.forEach (role => {num = num | (this.__p [role.id] || 0)})
+		client.roles.forEach (role => {num = num | (this.permissions [role.id] || 0)})
 
 		return num | 1
 	}
 
 	addcommands (client, resolve, reject) {
-		const command = this.__c
+		const command = this._command
 
 		let channel = client.channels.last ()
 
@@ -48,7 +45,7 @@ class pqDiscord {
 			return send (F ('%s : No permission.', F ('<@%s>', msg.author.id)))
 		}
 
-		fs.readdir ('./commands', 'utf8', (err, str) => { // hot loading oh boy
+		fs.readdir ('./commands', 'utf8', (err, str) => {
 			if (err)
 				return console.log ('discord no commands')
 
@@ -66,7 +63,7 @@ class pqDiscord {
 					noperm : noperm,
 					F      : F,
 					pqID   : pqID,
-				}) // env ? better ?
+				})
 			})
 		})
 	}
@@ -77,36 +74,35 @@ class pqDiscord {
 
 	start () {
 		return new Promise ((resolve, reject) => {
-			this._c = new discord.Client ()
+			this.dc = new discord.Client ()
 
-			this._c.on ('error', err => { // just fuck it
-				console.log (err)
-				return reject (err)
+			this.dc.on ('error', err => {
+				return reject (err.error.code)
 			})
 
-			this._c.on ('ready', () => {
-				this.addcommands (this._c, resolve, reject)
-				this.addevents   (this._c, resolve, reject)
-				console.log (F ('discord ready %s', this._c.user.username))
+			this.dc.on ('ready', () => {
+				this.addcommands (this.dc, resolve, reject)
+				this.addevents   (this.dc, resolve, reject)
+				console.log (F ('discord ready with `%s` `%s`', this.dc.user.username, this.dc.user.id))
 			})
 
-			this._c.on ('message', msg => {
-				if (this._c.user.id == msg.author.id) return
+			this.dc.on ('message', msg => {
+				if (this.dc.user.id == msg.author.id) return
 				if (msg.content     == ''           ) return
 
 				console.log (F ('module `discord` with `%s` in `%s` with `%s`', F ('%s#%s', msg.author.username, msg.author.discriminator), msg.guild ? msg.guild.name : 'dm', msg.content))
 
 				if (!msg.guild || msg.guild.id != '599853945438994442') return
 
-				if (this.__c.iscommand (msg.content))
-					return this.__c.parse ('discord', this.permission (msg.member), msg.content, msg)
+				if (this._command.iscommand (msg.content))
+					return this._command.parse ('discord', this.permission (msg.member), msg.content, msg)
 
 				// msg.channel.send (msg.content).then  (() => {}).catch (() => {})
 			})
 
 			fs.readFile ('discord.token', 'utf8', (err, data) => {
 				console.log (F ('discord starting with `%s`', data))
-				this._c.login (data)
+				this.dc.login (data)
 					.catch (()=>{
 						reject ('no login')
 					})
@@ -115,16 +111,17 @@ class pqDiscord {
 		.then (reason => {
 			console.log (F ('discord finished good with `%s`', reason))
 
-			this._c.destroy ()
+			this.dc.destroy ()
 
 			if (reason == 'reload') this.start ()
 		})
 		.catch (reason => {
 			console.log (F ('discord finished bad  with `%s`', reason))
 
-			this._c.destroy ()
+			this.dc.destroy ()
 
-			if (reason == 'no login') this.start ()
+			if (reason == 'no login' ) this.start ()
+			if (reason == 'ETIMEDOUT') this.start ()
 		})
 	}
 }
