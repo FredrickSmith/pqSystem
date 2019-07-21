@@ -12,7 +12,7 @@ class pqID {
 	generator (num, size) {
 		if (!num) return crypto.randomBytes (size).toString ('hex').toUpperCase ()
 
-		let arr = [];
+		let arr = []
 		for (i = 0; i < num; i++) {
 			arr.push (crypto.randomBytes (size).toString ('hex').toUpperCase ())
 		}

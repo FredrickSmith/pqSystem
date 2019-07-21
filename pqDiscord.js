@@ -7,8 +7,8 @@ const pqID = require ('./pqID.js')
 
 class pqDiscord {
 	constructor (env) {
-		this._command  = env.Command
-		this._event  = env.Event
+		this._command    = env.Command
+		this._event      = env.Event
 		this._permloader = env.PermissionLoader
 
 		this.permissions = this._permloader.loadfile ('./discord.permission')
@@ -45,30 +45,34 @@ class pqDiscord {
 			return send (F ('%s : No permission.', F ('<@%s>', msg.author.id)))
 		}
 
-		fs.readdir ('./commands', 'utf8', (err, str) => {
+		fs.readdir ('./discord.commands', 'utf8', (err, str) => {
 			if (err)
 				return console.log ('discord no commands')
 
 			str.forEach (file => {
-				const filename = F ('./commands/%s', file)
+				const filename = F ('./discord.commands/%s', file)
 
 				delete require.cache [require.resolve (filename)]
 				require (filename) ({
-					client : client,
+					client : client ,
 					channel: channel,
 					resolve: resolve,
-					reject : reject,
+					reject : reject ,
 					command: command,
-					send   : send,
-					noperm : noperm,
-					F      : F,
-					pqID   : pqID,
+					send   : send   ,
+					noperm : noperm ,
+					F      : F      ,
+					pqID   : pqID   ,
+
+					event  : this._event     ,
+					perms  : this._permloader,
+					discord: this            ,
 				})
 			})
 		})
 	}
 
-	addevents (client) {
+	addevents (client, resolve, reject) {
  
 	}
 
@@ -76,19 +80,21 @@ class pqDiscord {
 		return new Promise ((resolve, reject) => {
 			this.dc = new discord.Client ()
 
-			this.dc.on ('error', err => {
+			const client = this.dc
+
+			client.on ('error', err => {
 				return reject (err.error.code)
 			})
 
-			this.dc.on ('ready', () => {
-				this.addcommands (this.dc, resolve, reject)
-				this.addevents   (this.dc, resolve, reject)
-				console.log (F ('discord ready with `%s` `%s`', this.dc.user.username, this.dc.user.id))
+			client.on ('ready', () => {
+				this.addcommands (client, resolve, reject)
+				this.addevents   (client, resolve, reject)
+				console.log (F ('discord ready with `%s` `%s`', client.user.username, client.user.id))
 			})
 
-			this.dc.on ('message', msg => {
-				if (this.dc.user.id == msg.author.id) return
-				if (msg.content     == ''           ) return
+			client.on ('message', msg => {
+				if (client.user.id == msg.author.id) return
+				if (msg.content    == ''           ) return
 
 				console.log (F ('module `discord` with `%s` in `%s` with `%s`', F ('%s#%s', msg.author.username, msg.author.discriminator), msg.guild ? msg.guild.name : 'dm', msg.content))
 
@@ -102,7 +108,7 @@ class pqDiscord {
 
 			fs.readFile ('discord.token', 'utf8', (err, data) => {
 				console.log (F ('discord starting with `%s`', data))
-				this.dc.login (data)
+				client.login (data)
 					.catch (()=>{
 						reject ('no login')
 					})
