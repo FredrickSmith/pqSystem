@@ -2,7 +2,7 @@ const fs = require ('fs')
 
 const pqLex = require ('./pqLex')
 
-class pqPermissionLoader extends pqLex {
+class pqPermissionParser extends pqLex {
 	constructor () {
 		super ()
 	}
@@ -32,4 +32,4 @@ class pqPermissionLoader extends pqLex {
 	}
 }
 
-module.exports = pqPermissionLoader
+module.exports = pqPermissionParser

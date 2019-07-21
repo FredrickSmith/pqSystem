@@ -7,11 +7,11 @@ const pqID = require ('./pqID.js')
 
 class pqDiscord {
 	constructor (env) {
-		this._command    = env.Command
-		this._event      = env.Event
-		this._permloader = env.PermissionLoader
+		this._command          = env.Command
+		this._event            = env.Event
+		this._permissionparser = env.PermissionParser
 
-		this.permissions = this._permloader.loadfile ('./discord.permission')
+		this.permissions = this._permissionparser.loadfile ('./discord.permission')
 
 		return this
 	}
@@ -47,7 +47,7 @@ class pqDiscord {
 
 		fs.readdir ('./discord.commands', 'utf8', (err, str) => {
 			if (err)
-				return console.log ('discord no commands')
+				return reject ('no commands')
 
 			str.forEach (file => {
 				const filename = F ('./discord.commands/%s', file)
@@ -64,9 +64,9 @@ class pqDiscord {
 					F      : F      ,
 					pqID   : pqID   ,
 
-					event  : this._event     ,
-					perms  : this._permloader,
-					discord: this            ,
+					event  : this._event           ,
+					perms  : this._permissionparser,
+					discord: this                  ,
 				})
 			})
 		})
@@ -83,13 +83,20 @@ class pqDiscord {
 			const client = this.dc
 
 			client.on ('error', err => {
-				return reject (err.error.code)
+				if (err.error.code == 'ETIMEDOUT')
+					return reject ('timeout')
+
+				if (err.error.code == 'ENOTFOUND')
+					return reject ('timeout')
+				
+				return reject (F ('discord messed up with `%s`', err.error.code))
 			})
 
 			client.on ('ready', () => {
+				console.log (F ('discord ready with `%s` `%s`', client.user.username, client.user.id))
+
 				this.addcommands (client, resolve, reject)
 				this.addevents   (client, resolve, reject)
-				console.log (F ('discord ready with `%s` `%s`', client.user.username, client.user.id))
 			})
 
 			client.on ('message', msg => {
@@ -107,7 +114,11 @@ class pqDiscord {
 			})
 
 			fs.readFile ('discord.token', 'utf8', (err, data) => {
+				if (err)
+					return reject ('no token')
+
 				console.log (F ('discord starting with `%s`', data))
+
 				client.login (data)
 					.catch (()=>{
 						reject ('no login')
@@ -126,8 +137,10 @@ class pqDiscord {
 
 			this.dc.destroy ()
 
-			if (reason == 'no login' ) this.start ()
-			if (reason == 'ETIMEDOUT') this.start ()
+			if (reason == 'no login'   ) this.start ()
+			if (reason == 'timeout'    ) this.start ()
+			if (reason == 'no commands') console.log ('discord no discord.commands') // this.start ()
+			if (reason == 'no token'   ) console.log ('discord no discord.token'   ) // this.start ()
 		})
 	}
 }

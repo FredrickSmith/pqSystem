@@ -1,7 +1,7 @@
 
 const pqCommand          = require ('./pqCommand'         )
 const pqEvent            = require ('./pqEvent'           )
-const pqPermissionLoader = require ('./pqPermissionLoader')
+const pqPermissionParser = require ('./pqPermissionParser')
 
 const pqModule = require ('./pqModule')
 	const pqDiscord    = require ('./pqDiscord'   )
@@ -10,7 +10,7 @@ const pqModule = require ('./pqModule')
 let pqModuleManager = new pqModule ('pq Management System')
 	pqModuleManager.Module ('Base', 'Command'         , pqCommand         )
 	pqModuleManager.Module ('Base', 'Event'           , pqEvent           )
-	pqModuleManager.Module ('Base', 'PermissionLoader', pqPermissionLoader)
+	pqModuleManager.Module ('Base', 'PermissionParser', pqPermissionParser)
 
 	pqModuleManager.Module ('Module', 'Discord'   , pqDiscord   )
 	pqModuleManager.Module ('Module', 'TeamSpeak3', pqTeamspeak3)
