@@ -5,9 +5,11 @@ module.exports = (env) => {
 	const send    = env.send
 	const noperm  = env.noperm
 
+	const done = () => {resolve ('reload')}
+
 	command.addcommand ('discord', 'reload', ['Reload', 'r'], 'Reloads the bot', 2,
 		msg => {
-			return send ('ok reloading', ()=>{resolve ('reload')}, ()=>{resolve ('reload')})
+			return send ('ok reloading', done, done)
 		}, noperm
 	)
 }

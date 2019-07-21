@@ -6,15 +6,17 @@ const discord = require ('discord.js')
 const pqID = require ('./pqID.js')
 
 class pqDiscord {
-	constructor (command, event) {
-		this.__c = command
-		this.__e = event
+	constructor (env) {
+		this.__c = env.Command
+		this.__e = env.Event
 
 		this.__p = {
 			'600261179826503680': 14, // pq
 			'599877756834152450': 12, // officer
 			'600261181214818305': 0 , // zarp
 		}
+
+		return this
 	}
 
 	permission (client) {
@@ -77,6 +79,11 @@ class pqDiscord {
 		return new Promise ((resolve, reject) => {
 			this._c = new discord.Client ()
 
+			this._c.on ('error', err => { // just fuck it
+				console.log (err)
+				return reject (err)
+			})
+
 			this._c.on ('ready', () => {
 				this.addcommands (this._c, resolve, reject)
 				this.addevents   (this._c, resolve, reject)
@@ -84,11 +91,12 @@ class pqDiscord {
 			})
 
 			this._c.on ('message', msg => {
-				if (!msg.guild || msg.guild.id != '599853945438994442') return
-				if (this._c.user.id == msg.author.id                  ) return
-				if (msg.content     == ''                             ) return
+				if (this._c.user.id == msg.author.id) return
+				if (msg.content     == ''           ) return
 
 				console.log (F ('module `discord` with `%s` in `%s` with `%s`', F ('%s#%s', msg.author.username, msg.author.discriminator), msg.guild ? msg.guild.name : 'dm', msg.content))
+
+				if (!msg.guild || msg.guild.id != '599853945438994442') return
 
 				if (this.__c.iscommand (msg.content))
 					return this.__c.parse ('discord', this.permission (msg.member), msg.content, msg)
@@ -97,7 +105,7 @@ class pqDiscord {
 			})
 
 			fs.readFile ('discord.token', 'utf8', (err, data) => {
-				console.log (F ('discord start? %s', data))
+				console.log (F ('discord starting with `%s`', data))
 				this._c.login (data)
 					.catch (()=>{
 						reject ('no login')
@@ -105,19 +113,18 @@ class pqDiscord {
 			})
 		})
 		.then (reason => {
-			console.log (F ('discord finished with `%s`', reason))
+			console.log (F ('discord finished good with `%s`', reason))
 
 			this._c.destroy ()
 
 			if (reason == 'reload') this.start ()
 		})
 		.catch (reason => {
-			console.log (F ('discord finished with `%s`', reason))
+			console.log (F ('discord finished bad  with `%s`', reason))
 
 			this._c.destroy ()
 
 			if (reason == 'no login') this.start ()
-			if (reason == 'reload'  ) this.start ()
 		})
 	}
 }

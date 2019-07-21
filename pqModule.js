@@ -1,43 +1,53 @@
 
 class pqModule {
 	constructor (name, module) {
-		this.__n = name
-		this.__m = module
+		this._n = name
+		this._m = module
 	}
 
+	get name ( ) {return this._n    }
+	set name (_) {       this._n = _}
+
 	create (..._) {
-		this.__m = new this.__m (..._)
+		this._m = new this._m (..._)
+
+		return this._m
 	}
 
 	start (..._) {
-		this.__m.start ()
+		return this._m.start ()
 	}
 }
 
 class pqModuleManager {
 	constructor (name) {
-		this.__n = name
+		this._n = name
 
-		this.__m = {}
+		this._m = {}
 	}
 
 	Module (type, name, module) {
-		this.__m [type] = this.__m [type] ? this.__m [type] : {}
-		this.__m [type] [name] = new pqModule (name, module)
+		this._m [type] = this._m [type] ? this._m [type] : {}
+		this._m [type] [name] = new pqModule (name, module)
 	}
 
 	Start () {
-		for (module in this.__m ['Base']) {
-			this.__m ['Base'] [module].create ()
+		let env     = {}
+		let modules = {}
+
+		modules = this._m ['Base']
+		for (let module in modules) {
+			let bmodule = modules [module]
+			bmodule.create ()
+
+			env [bmodule.name] = bmodule._m
 		}
 
-		for (module in this.__m ['Module']) {
-			this.__m ['Module'] [module].create ( // how to unpack???
-				this.__m ['Base'] ['Command'].__m,
-				this.__m ['Base'] ['Event'  ].__m,
-			)
+		modules = this._m ['Module']
+		for (let module in modules) {
+			let mmodule = modules [module]
 
-			this.__m ['Module'] [module].start ()
+			mmodule.create (env).start ()
 		}
 	}
 }

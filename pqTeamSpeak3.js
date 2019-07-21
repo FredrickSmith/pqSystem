@@ -1,9 +1,11 @@
 const TeamSpeak3 = require ('ts3-nodejs-library')
 
 class pqTeamSpeak3 {
-	constructor (command, event) {
-		this.__c = command
-		this.__e = event
+	constructor (env) {
+		this.__c = env.Command
+		this.__e = env.Event
+
+		return this
 	}
 
 	start () {
