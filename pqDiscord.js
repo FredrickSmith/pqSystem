@@ -64,9 +64,9 @@ class pqDiscord {
 					F      : F      ,
 					pqID   : pqID   ,
 
-					event  : this._event           ,
-					perms  : this._permissionparser,
-					discord: this                  ,
+					event    : this._event           ,
+					permparse: this._permissionparser,
+					pqDiscord: this                  ,
 				})
 			})
 		})
