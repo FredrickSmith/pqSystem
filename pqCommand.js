@@ -37,6 +37,8 @@
 // pq      - 1110   - 14
 // officer - 1100   - 12
 
+const pqCommandParser = require ('./pqCommandParser')
+
 class pqCommand {
 	constructor (name, aliases, description, permission, format, pfunc, efunc) {
 		this._name        = name
@@ -78,10 +80,7 @@ class pqCommandManager {
 		this.aliases      = {}
 		this.permissions  = {}
 
-		this.prefix       = {
-			'!': true,
-			'/': true,
-		}
+		this.commandparser = new pqCommandParser ()
 	}
 
 	get commands ( ) {return this._commands    }
@@ -102,25 +101,18 @@ class pqCommandManager {
 	}
 
 	iscommand (str) {
-		if (!this.prefix [str.substr (0, 1)]) return false
-
-		let command = str.split (' ') [0].substr (1)
-
-		return this.commands [command] || this.aliases [command]
+		return this.commandparser.parse (str, this.commands, this.aliases)
 	}
 
-	parse (format, permission, str, ..._) {
-		let command = str.split (' ') [0].substr (1)
+	parse (format, permission, prx, cmd, args, ..._) {
 
-		command = this.commands [command] ? command : this.aliases [command]
+		const commandclass = this.commands [cmd]
 
-		let commandclass = this.commands [command]
-
-		if ((this.permissions [command] & permission) != 0) {
-			return commandclass.run (format, ..._)
+		if ((this.permissions [cmd] & permission) != 0) {
+			return commandclass.run (format, args, ..._)
 		}
 
-		return commandclass.error (format, ..._)
+		return commandclass.error (format, args, ..._)
 	}
 }
 

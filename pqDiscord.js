@@ -107,8 +107,10 @@ class pqDiscord {
 
 				if (!msg.guild || msg.guild.id != '599853945438994442') return
 
-				if (this._command.iscommand (msg.content))
-					return this._command.parse ('discord', this.permission (msg.member), msg.content, msg)
+				const [iscommand, prefix, command, args] = this._command.iscommand (msg.content)
+
+				if (iscommand)
+					return this._command.parse ('discord', this.permission (msg.member), prefix, command, args, msg)
 
 				// msg.channel.send (msg.content).then  (() => {}).catch (() => {})
 			})

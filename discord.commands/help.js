@@ -6,7 +6,7 @@ module.exports = (env) => {
 	const F       = env.F
 
 	command.addcommand ('discord', 'help', ['h'], 'help please', 1,
-		msg => {
+		(args, msg) => {
 			const commands = command.commands
 
 			let str = '```\npq\n'

@@ -8,7 +8,7 @@ module.exports = (env) => {
 	const done = () => {resolve ('reload')}
 
 	command.addcommand ('discord', 'reload', ['Reload', 'r'], 'Reloads the bot', 2,
-		msg => {
+		(args, msg) => {
 			return send ('ok reloading', done, done)
 		}, noperm
 	)

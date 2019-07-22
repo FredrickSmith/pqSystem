@@ -5,21 +5,49 @@ const pqLex = require ('./pqLex')
 class pqCommandParser extends pqLex {
 	constructor () {
 		super ()
+
+		this.prefix = {
+			'!': true,
+			'/': true,
+		}
+
+		this.whitespace = {
+			' ': true,
+			'	': true,
+		}
+		this.string = {
+			'\'': true,
+			'\"': true,
+		}
+		this.eos = {
+			'': true
+		}
 	}
 
-	parse (file) {
+	parse (str, cmds, als) {
 		this.pos = 0
-		this.txt = file
+		this.txt = str
+
+		const prefix = this.lookahead (0)
+
+		if (!this.prefix [prefix])
+			return [false, '', '', []]
+
+		const cmd = this.lookaheaduntil ('', 1, (c, pos) => {if (this.eos [c] || this.whitespace [c]) return 0})
+		const realcmd = cmds [cmd] ? cmd : als [cmd]
+
+		if (!realcmd)
+			return [false, '', '', []]
 
 		let argument = []
 		while (true) {
-			if (this.pos >= file.length) break
+			if (this.pos >= str.length) break
 
 			const _c = this.lookahead (0)
 
-			if ((_c == ' ') || (_c == '	')) {
-				this.lookaheaduntil (_c, 1, (c, pos)=>{if (!((c == ' ') || (c == '	'))) return -1})
-			} else if ((_c == '\'') || (_c == '"')) {
+			if (this.whitespace [_c]) {
+				this.lookaheaduntil (_c, 1, (c, pos)=>{if (!this.whitespace [c]) return -1})
+			} else if (this.string [_c]) {
 				argument.push (this.lookaheaduntil ('', 1, (c, pos)=>{
 					if (_c == c) {
 						if (this.lookbehind (-pos + 1) == '\\') {
@@ -37,12 +65,12 @@ class pqCommandParser extends pqLex {
 					}
 				}))
 			} else {
-				argument.push (this.lookaheaduntil (_c, 1, (c, pos) => {if ((c == '') || (c == ' ') || (c == '	')) return -1}))
+				argument.push (this.lookaheaduntil (_c, 1, (c, pos) => {if (this.eos [c] || this.whitespace [c]) return -1}))
 			}
 
 			this.pos++
 		}
-		return argument
+		return [true, prefix, realcmd, argument]
 	}
 }
 
