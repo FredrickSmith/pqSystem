@@ -5,6 +5,8 @@ node_modules
 discord.token
 discord.permission
 
+permission.txt
+
 package-lock.json
 
 *.code-workspace

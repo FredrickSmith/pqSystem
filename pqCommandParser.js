@@ -29,6 +29,7 @@ class pqCommandParser extends pqLex {
 		this.txt = str
 
 		const prefix = this.lookahead (0)
+		// const prefix = this.lookaheaduntil ('', 0, (c, pos) => {if (this.prefix [c] || this.eos [c] || this.whitespace [c]) return 0}, true)
 
 		if (!this.prefix [prefix])
 			return [false, '', '', []]

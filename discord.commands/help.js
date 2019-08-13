@@ -17,6 +17,6 @@ module.exports = (env) => {
 			str += '\n```'
 
 			return send (str)
-		}, noperm // ok?
+		}, noperm
 	)
 }

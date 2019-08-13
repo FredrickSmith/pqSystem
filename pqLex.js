@@ -1,5 +1,7 @@
 class pqLex {
-	constructor () {}
+	constructor () {
+		this.pos = 0
+	}
 
 	lookahead (len) {
 		return this.txt.substring (this.pos + len, this.pos + len + 1)

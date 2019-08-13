@@ -107,12 +107,12 @@ class pqDiscord {
 
 				if (!msg.guild || msg.guild.id != '599853945438994442') return
 
-				const [iscommand, prefix, command, args] = this._command.iscommand (msg.content)
+				const cmd = this._command
+
+				const [iscommand, prefix, command, args] = cmd.iscommand (msg.content)
 
 				if (iscommand)
-					return this._command.parse ('discord', this.permission (msg.member), prefix, command, args, msg)
-
-				// msg.channel.send (msg.content).then  (() => {}).catch (() => {})
+					return cmd.parse ('discord', this.permission (msg.member), prefix, command, args, msg)
 			})
 
 			fs.readFile ('discord.token', 'utf8', (err, data) => {
@@ -141,8 +141,8 @@ class pqDiscord {
 
 			if (reason == 'no login'   ) this.start ()
 			if (reason == 'timeout'    ) this.start ()
-			if (reason == 'no commands') console.log ('discord no discord.commands') // this.start ()
-			if (reason == 'no token'   ) console.log ('discord no discord.token'   ) // this.start ()
+			if (reason == 'no commands') console.log ('discord no discord.commands')
+			if (reason == 'no token'   ) console.log ('discord no discord.token'   )
 		})
 	}
 }
