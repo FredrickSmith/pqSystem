@@ -63,6 +63,7 @@ class pqDiscord {
 					noperm : noperm ,
 					F      : F      ,
 					pqID   : pqID   ,
+					fs     : fs     ,
 
 					event    : this._event           ,
 					permparse: this._permissionparser,
@@ -96,7 +97,7 @@ class pqDiscord {
 				console.log (F ('discord ready with `%s` `%s`', client.user.username, client.user.id))
 
 				this.addcommands (client, resolve, reject)
-				this.addevents   (client, resolve, reject)
+				// this.addevents   (client, resolve, reject)
 			})
 
 			client.on ('message', msg => {

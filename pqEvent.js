@@ -5,4 +5,12 @@ class pqEvent {
 	start () {}
 }
 
-module.exports = pqEvent
+class pqEventManager {
+	constructor () {}
+
+	start () {
+
+	}
+}
+
+module.exports = pqEventManager

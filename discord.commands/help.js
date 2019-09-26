@@ -5,7 +5,7 @@ module.exports = (env) => {
 	const noperm  = env.noperm
 	const F       = env.F
 
-	command.addcommand ('discord', 'help', ['h'], 'help please', 1,
+	command.addcommand ('discord', 'help', ['Help', 'h'], 'help please', 1,
 		(args, msg) => {
 			const commands = command.commands
 

@@ -16,7 +16,7 @@ class pqTeamSpeak3 {
 	// 			console.log ('teamspeak ready')
 	// 		})
 
-	// 		this._c .on ('clientconnect', ({ client }) => {
+	// 		this._c.on ('clientconnect', ({ client }) => {
 	// 			let channelname = ''
 	// 			client.on ('move', channel => {
 	// 				channelname = channel.name
