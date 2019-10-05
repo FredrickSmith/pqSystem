@@ -11,7 +11,7 @@ class pqDiscord {
 		this._event            = env.Event
 		this._permissionparser = env.PermissionParser
 
-		this.permissions = this._permissionparser.loadfile ('./discord.permission')
+		this.permissions = this._permissionparser.loadfile ('./data/discord.permission')
 
 		return this
 	}
@@ -41,7 +41,7 @@ class pqDiscord {
 				.then  (thn)
 				.catch (cth)
 		}
-		const noperm = msg => {
+		const noperm = (args, msg) => {
 			return send (F ('%s : No permission.', F ('<@%s>', msg.author.id)))
 		}
 
@@ -53,22 +53,26 @@ class pqDiscord {
 				const filename = F ('./discord.commands/%s', file)
 
 				delete require.cache [require.resolve (filename)]
-				require (filename) ({
-					client : client ,
-					channel: channel,
-					resolve: resolve,
-					reject : reject ,
-					command: command,
-					send   : send   ,
-					noperm : noperm ,
-					F      : F      ,
-					pqID   : pqID   ,
-					fs     : fs     ,
+				try {
+					require (filename) ({
+						client : client ,
+						channel: channel,
+						resolve: resolve,
+						reject : reject ,
+						command: command,
+						send   : send   ,
+						noperm : noperm ,
+						F      : F      ,
+						pqID   : pqID   ,
+						fs     : fs     ,
 
-					event    : this._event           ,
-					permparse: this._permissionparser,
-					pqDiscord: this                  ,
-				})
+						event    : this._event           ,
+						permparse: this._permissionparser,
+						pqDiscord: this                  ,
+					})
+				} catch (e) {
+					console.log (F ('couldnt load: %s : %s', file, e))
+				}
 			})
 		})
 	}
@@ -116,7 +120,7 @@ class pqDiscord {
 					return cmd.parse ('discord', this.permission (msg.member), prefix, command, args, msg)
 			})
 
-			fs.readFile ('discord.token', 'utf8', (err, data) => {
+			fs.readFile ('./data/discord.token', 'utf8', (err, data) => {
 				if (err)
 					return reject ('no token')
 

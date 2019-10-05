@@ -12,7 +12,7 @@ module.exports = (env) => {
 
 	command.addcommand ('discord', 'gstart', ['gs'], 'google maps start', 16,
 		(args, msg) => {
-			fs.readFile ('google_1.token', 'utf8', (err, data) => {
+			fs.readFile ('data/google_1.token', 'utf8', (err, data) => {
 				if (err)
 					return send ('g1: no token')
 
@@ -43,7 +43,6 @@ module.exports = (env) => {
 					if (!place)
 						send ('```failed: no place```')
 
-					console.log (place.geometry.location)
 					send (F ('```\n>	%s\n<	%s\n<	%s\n<	%s\n<	%s,%s```', args.join (' '), place.name, place.formatted_address, place.place_id, place.geometry.location.lat, place.geometry.location.lng))
 				})
 			} catch (err) {

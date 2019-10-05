@@ -18,7 +18,7 @@ module.exports = (env) => {
 				discord.permissions = permparse.loadfile ('./discord.permission')
 				return send ('ok reloaded permissions', fake, fake)
 			}
-			if (args [0] == 'command') {
+			if ((args [0] == 'command') || (args [0] == 'commands')) {
 				discord.addcommands (client, resolve, reject)
 				return send ('ok reloaded commands', fake, fake)
 			}

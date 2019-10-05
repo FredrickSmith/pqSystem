@@ -2,11 +2,7 @@
 
 node_modules
 
-discord.token
-discord.permission
-
-google_1.token
-google_2.token
+data
 
 permission.txt
 
