@@ -54,7 +54,7 @@ class pqDiscord {
 
 				delete require.cache [require.resolve (filename)]
 				try {
-					require (filename) ({
+					require (filename) ({ // how can better ????
 						client : client ,
 						channel: channel,
 						resolve: resolve,
@@ -71,7 +71,7 @@ class pqDiscord {
 						pqDiscord: this                  ,
 					})
 				} catch (e) {
-					console.log (F ('couldnt load: %s : %s', file, e))
+					console.log (F ('module `discord` message `couldnt load: %s : %s`', file, e))
 				}
 			})
 		})
@@ -94,11 +94,11 @@ class pqDiscord {
 				if (err.error.code == 'ENOTFOUND')
 					return reject ('timeout')
 				
-				return reject (F ('discord messed up with `%s`', err.error.code))
+				return reject (F ('module `discord` message `messed up with: %s`', err.error.code))
 			})
 
 			client.on ('ready', () => {
-				console.log (F ('discord ready with `%s` `%s`', client.user.username, client.user.id))
+				console.log (F ('module `discord` message `ready with: %s : %s`', client.user.username, client.user.id))
 
 				this.addcommands (client, resolve, reject)
 				// this.addevents   (client, resolve, reject)
@@ -115,16 +115,18 @@ class pqDiscord {
 				const cmd = this._command
 
 				const [iscommand, prefix, command, args] = cmd.iscommand (msg.content)
-
-				if (iscommand)
-					return cmd.parse ('discord', this.permission (msg.member), prefix, command, args, msg)
+				try {
+					if (iscommand) return cmd.parse ('discord', this.permission (msg.member), prefix, command, args, msg)
+				} catch (e) {
+					console.log (F ('module `discord` message `command errored: %s`', msg.content))
+				}
 			})
 
 			fs.readFile ('./data/discord.token', 'utf8', (err, data) => {
 				if (err)
 					return reject ('no token')
 
-				console.log (F ('discord starting with `%s`', data))
+				console.log (F ('module `discord` message `starting with: %s`', data))
 
 				client.login (data)
 					.catch (()=>{
@@ -133,21 +135,21 @@ class pqDiscord {
 			})
 		})
 		.then (reason => {
-			console.log (F ('discord finished good with `%s`', reason))
+			console.log (F ('module `discord` message `finished good with: %s`', reason))
 
 			this.dc.destroy ()
 
 			if (reason == 'reload') this.start ()
 		})
 		.catch (reason => {
-			console.log (F ('discord finished bad  with `%s`', reason))
+			console.log (F ('module `discord` message `finished bad with: %s`', reason))
 
 			this.dc.destroy ()
 
 			if (reason == 'no login'   ) this.start ()
 			if (reason == 'timeout'    ) this.start ()
-			if (reason == 'no commands') console.log ('discord no discord.commands')
-			if (reason == 'no token'   ) console.log ('discord no discord.token'   )
+			if (reason == 'no commands') console.log ('module `discord` message `no: discord.commands`')
+			if (reason == 'no token'   ) console.log ('module `discord` message `no: discord.token`'   )
 		})
 	}
 }

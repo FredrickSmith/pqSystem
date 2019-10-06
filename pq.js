@@ -1,18 +1,10 @@
 
-const pqCommand          = require ('./pqCommand'         )
-const pqEvent            = require ('./pqEvent'           )
-const pqPermissionParser = require ('./pqPermissionParser')
+new (require ('./pqModule')) ('pq Management System')
+	.Module ('Base', 'Command'         , require ('./pqCommand'         ))
+	.Module ('Base', 'Event'           , require ('./pqEvent'           ))
+	.Module ('Base', 'PermissionParser', require ('./pqPermissionParser'))
 
-const pqModule = require ('./pqModule')
-	const pqDiscord    = require ('./pqDiscord'   )
-	const pqTeamspeak3 = require ('./pqTeamSpeak3')
+	.Module ('Module', 'Discord'   , require ('./pqDiscord'   ))
+	.Module ('Module', 'TeamSpeak3', require ('./pqTeamSpeak3'))
 
-let pqModuleManager = new pqModule ('pq Management System')
-	pqModuleManager.Module ('Base', 'Command'         , pqCommand         )
-	pqModuleManager.Module ('Base', 'Event'           , pqEvent           )
-	pqModuleManager.Module ('Base', 'PermissionParser', pqPermissionParser)
-
-	pqModuleManager.Module ('Module', 'Discord'   , pqDiscord   )
-	pqModuleManager.Module ('Module', 'TeamSpeak3', pqTeamspeak3)
-
-pqModuleManager.Start ()
+	.Start ()

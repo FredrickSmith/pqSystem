@@ -29,6 +29,8 @@ class pqModuleManager {
 	Module (type, name, module) {
 		this._m [type] = this._m [type] ? this._m [type] : {}
 		this._m [type] [name] = new pqModule (name, module)
+
+		return this
 	}
 
 	Start () {
