@@ -48,7 +48,7 @@ class pqCommandManager {
 	get commands ( ) {return this._commands    }
 	set commands (_) {       this._commands = _}
 
-	addcommand (format, name, aliases = [], description, permission, funcperm, funcnoperm) {
+	add (format, name, aliases = [], description, permission, funcperm, funcnoperm) {
 		if (this.commands [name]) {
 			this.commands [name].addformat (format, funcperm, funcnoperm)
 		} else {
@@ -62,7 +62,7 @@ class pqCommandManager {
 		}
 	}
 
-	iscommand (str) {
+	is (str) {
 		return this.commandparser.parse (str, this.commands, this.aliases)
 	}
 

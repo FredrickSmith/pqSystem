@@ -10,7 +10,7 @@ module.exports = (env) => {
 
 	const googlemaps = require ('@google/maps')
 
-	command.addcommand ('discord', 'gstart', ['gs'], 'google maps start', 16,
+	command.add ('discord', 'gstart', ['gs'], 'google maps start', 16,
 		(args, msg) => {
 			fs.readFile ('data/google_1.token', 'utf8', (err, data) => {
 				if (err)
@@ -25,7 +25,7 @@ module.exports = (env) => {
 		}, noperm
 	)
 
-	command.addcommand ('discord', 'gsearch', ['gz'], 'google maps search', 16,
+	command.add ('discord', 'gsearch', ['gz'], 'google maps search', 16,
 		(args, msg) => {
 			try {
 				google.gs.findPlace ({

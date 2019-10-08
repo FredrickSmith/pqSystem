@@ -5,7 +5,7 @@ module.exports = (env) => {
 	const noperm  = env.noperm
 	const F       = env.F
 
-	command.addcommand ('discord', 'help', ['Help', 'h'], 'help please', 1,
+	command.add ('discord', 'help', ['Help', 'h'], 'help please', 1,
 		(args, msg) => {
 			const commands = command.commands
 
@@ -20,7 +20,7 @@ module.exports = (env) => {
 		}, noperm
 	)
 
-	command.addcommand ('discord', 'd2?', [], 'conversion from dec/hex/bin to dec/hex/bin', 1,
+	command.add ('discord', 'd2?', [], 'conversion from dec/hex/bin to dec/hex/bin', 1,
 		(args, msg) => {
 			return send (parseInt(args [0], args [2] || 10).toString (parseInt (args [1])))
 		}, noperm

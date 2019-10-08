@@ -101,7 +101,7 @@ class pqDiscord {
 				console.log (F ('module `discord` message `ready with: %s : %s`', client.user.username, client.user.id))
 
 				this.addcommands (client, resolve, reject)
-				// this.addevents   (client, resolve, reject)
+				this.addevents   (client, resolve, reject)
 			})
 
 			client.on ('message', msg => {
@@ -114,7 +114,7 @@ class pqDiscord {
 
 				const cmd = this._command
 
-				const [iscommand, prefix, command, args] = cmd.iscommand (msg.content)
+				const [iscommand, prefix, command, args] = cmd.is (msg.content)
 				try {
 					if (iscommand) return cmd.parse ('discord', this.permission (msg.member), prefix, command, args, msg)
 				} catch (e) {
