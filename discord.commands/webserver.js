@@ -25,7 +25,7 @@ module.exports = (env) => {
 			app.get ('/req/:a', (req, res) => {
 				send (F ('```lua\nheaders: %s\ncookies: %s\nparams: %s\nquery: %s\npath: %s\nremote: %s - %s:%s```',
 					JSON.stringify (req.headers),
-					JSON.stringify (req.cookies),
+					req.headers.cookie,
 					JSON.stringify (req.params),
 					JSON.stringify (req.query),
 					req.path,
@@ -38,17 +38,22 @@ module.exports = (env) => {
 
 			app.get ('/*', (_, res) => {return res.send ('hi')})
 			app.get ('/' , (_, res) => {return res.send ('hi')})
+
+			return send (F ('server listening on?: %s', args [0] || 0xBBBE))
 		}, noperm
 	)
 
 	command.add ('discord', 'wsend', ['wse'], 'end webserver', 32,
 		(args, msg) => {
-			srv.close ()
+			if (!(srv === undefined) && srv.listening)
+				srv.close ()
 		}, noperm
 	)
 
 	event.add ('reload:command', 'ws:close', () => {
-		if (!(srv === undefined))
+		if (!(srv === undefined) && srv.listening)
 			srv.close ()
+
+		srv = undefined
 	})
 }

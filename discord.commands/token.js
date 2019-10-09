@@ -13,7 +13,7 @@ module.exports = (env) => {
 		}, noperm
 	)
 
-	command.add ('discord', 'token', ['Token', 't'], 'Randomly generated token', 8,
+	command.add ('discord', 'token', ['Token', 't'], 'Randomly generated token', 4,
 		(args, msg) => {
 			return send (id.token ())
 		}, noperm

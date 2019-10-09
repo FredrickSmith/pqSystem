@@ -27,7 +27,7 @@ module.exports = (env) => {
 				discord.addcommands (client, resolve, reject)
 				return send ('ok reloaded commands', fake, fake)
 			}
-			if (args [0] == 'event') {
+			if ((args [0] == 'event') || (args [0] == 'events')) {
 				event.run ('reload:event')
 
 				discord.addevents (client, resolve, reject)

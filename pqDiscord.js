@@ -78,7 +78,35 @@ class pqDiscord {
 	}
 
 	addevents (client, resolve, reject) {
- 
+		const command = this._command
+
+		fs.readdir ('./discord.events', 'utf8', (err, str) => {
+			if (err)
+				return reject ('no events')
+
+			str.forEach (file => {
+				const filename = F ('./discord.events/%s', file)
+
+				delete require.cache [require.resolve (filename)]
+				try {
+					require (filename) ({ // how can better ????
+						client : client ,
+						resolve: resolve,
+						reject : reject ,
+						command: command,
+						F      : F      ,
+						pqID   : pqID   ,
+						fs     : fs     ,
+
+						event    : this._event           ,
+						permparse: this._permissionparser,
+						pqDiscord: this                  ,
+					})
+				} catch (e) {
+					console.log (F ('module `discord` message `couldnt load: %s : %s`', file, e))
+				}
+			})
+		})
 	}
 
 	start () {
@@ -108,7 +136,10 @@ class pqDiscord {
 				if (client.user.id == msg.author.id) return
 				if (msg.content    == ''           ) return
 
-				console.log (F ('module `discord` with `%s` in `%s` with `%s`', F ('%s#%s', msg.author.username, msg.author.discriminator), msg.guild ? msg.guild.name : 'dm', msg.content))
+				const txt = F ('module `discord` with `%s` in `%s` with `%s`', F ('%s#%s', msg.author.username, msg.author.discriminator), msg.guild ? msg.guild.name : 'dm', msg.content)
+
+				console.log (txt)
+				this._event.run ('discord:log', txt)
 
 				if (!msg.guild || msg.guild.id != '599853945438994442') return
 
@@ -146,10 +177,17 @@ class pqDiscord {
 
 			this.dc.destroy ()
 
-			if (reason == 'no login'   ) this.start ()
-			if (reason == 'timeout'    ) this.start ()
-			if (reason == 'no commands') console.log ('module `discord` message `no: discord.commands`')
-			if (reason == 'no token'   ) console.log ('module `discord` message `no: discord.token`'   )
+			if (this._event.run ('discord:finishbad', reason)) {
+				console.log ('module `discord` message `timeout`')
+
+				return setTimeout (() => {this.start ()}, 1000)
+			}
+
+			if (reason == 'no login'   ) return this.start ()
+			if (reason == 'timeout'    ) return this.start ()
+			if (reason == 'no commands') return console.log ('module `discord` message `no: discord.commands`')
+			if (reason == 'no events'  ) return console.log ('module `discord` message `no: discord.events'   )
+			if (reason == 'no token'   ) return console.log ('module `discord` message `no: discord.token`'   )
 		})
 	}
 }

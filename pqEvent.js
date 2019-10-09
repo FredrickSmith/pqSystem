@@ -8,7 +8,7 @@ class pqEvent {
 		this.efunc = efunc
 	}
 
-	run (..._) {this.efunc (..._)}
+	run (..._) {return this.efunc (..._)}
 }
 
 class pqEventManager {
@@ -24,6 +24,12 @@ class pqEventManager {
 		if (!this._cache [event])
 			this._cache [event] = {}
 
+		if (this._cache [event] [name]) {
+			const cache = this._cache [event] [name]
+
+			this._events [event] [cache [0]].splice (cache [1])
+		}
+
 		this._cache [event] [name] = [
 			priority,
 			this._events [event] [priority].length
@@ -36,7 +42,7 @@ class pqEventManager {
 		const cache = this._cache [event] [name]
 
 		delete this._cache  [event] [name]
-		delete this._events [event] [cache [0]] [cache [1]]
+		this._events [event] [cache [0]].splice (cache [1])
 	}
 
 	run (event, ..._) {
@@ -44,14 +50,18 @@ class pqEventManager {
 
 		if (!ea) return
 
+		let r
+
 		for (let a = 0; a <= 4; a++) {
 			const ec = ea [a]
 
 			if (ec.length == 0) continue
 
 			for (let b = 0; b <= ec.length - 1; b++)
-				ec [b].run (..._)
+				r = ec [b].run (..._)
 		}
+
+		return r
 	}
 }
 
