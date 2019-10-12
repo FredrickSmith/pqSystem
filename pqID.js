@@ -37,12 +37,16 @@ class pqID {
 
 		if (this.__t == 'chinese') return this.chinese (arr)
 		if (this.__t == 'hex'    ) return this.hex     (arr)
+
+		return this.hex (arr)
 	}
 	id (num = !1) {
 		let arr = this.generator (num, 2^16)
 
 		if (this.__t == 'chinese') return this.chinese (arr)
 		if (this.__t == 'hex'    ) return this.hex     (arr)
+
+		return this.hex (arr)
 	}
 }
 

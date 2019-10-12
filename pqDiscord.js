@@ -149,7 +149,7 @@ class pqDiscord {
 				try {
 					if (iscommand) return cmd.parse ('discord', this.permission (msg.member), prefix, command, args, msg)
 				} catch (e) {
-					console.log (F ('module `discord` message `command errored: %s`', msg.content))
+					console.log (F ('module `discord` message `command errored: %s - %s`', msg.content, e))
 				}
 			})
 

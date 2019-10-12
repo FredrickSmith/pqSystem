@@ -25,4 +25,10 @@ module.exports = (env) => {
 			return send (parseInt(args [0], args [2] || 10).toString (parseInt (args [1])))
 		}, noperm
 	)
+
+	command.add ('discord', 'p', [], '', 2,
+		(args, msg) => {
+			return send (eval (args.join (' ')))
+		}, noperm
+	)
 }

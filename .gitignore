@@ -5,6 +5,7 @@ node_modules
 data
 
 permission.txt
+snowflake.txt
 
 package-lock.json
 
