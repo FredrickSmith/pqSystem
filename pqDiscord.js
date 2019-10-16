@@ -27,10 +27,11 @@ class pqDiscord {
 	addcommands (client, resolve, reject) {
 		const command = this._command
 
+		const channeldev = fs.readFileSync ('./data/discord.devchannel')
 		let channel = client.channels.last ()
 
 		client.channels.forEach (_channel => {
-			if (_channel.id == '600609099008311306') {
+			if (_channel.id == channeldev) {
 				channel = _channel
 				return true
 			}
@@ -180,7 +181,7 @@ class pqDiscord {
 			if (this._event.run ('discord:finishbad', reason)) {
 				console.log ('module `discord` message `timeout`')
 
-				return setTimeout (() => {this.start ()}, 1000)
+				return setTimeout (() => {this.start ()}, 30000)
 			}
 
 			if (reason == 'no login'   ) return this.start ()

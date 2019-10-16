@@ -18,6 +18,7 @@ class pqCommandParser extends pqLex {
 		this.string = {
 			'\'': true,
 			'\"': true,
+			'\`': true,
 		}
 		this.eos = {
 			'': true

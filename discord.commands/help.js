@@ -5,6 +5,8 @@ module.exports = (env) => {
 	const noperm  = env.noperm
 	const F       = env.F
 
+	send ('started')
+
 	command.add ('discord', 'help', ['Help', 'h'], 'help please', 1,
 		(args, msg) => {
 			const commands = command.commands
