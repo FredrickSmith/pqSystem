@@ -148,7 +148,13 @@ class pqDiscord {
 
 				const [iscommand, prefix, command, args] = cmd.is (msg.content)
 				try {
-					if (iscommand) return cmd.parse ('discord', this.permission (msg.member), prefix, command, args, msg)
+					if (iscommand) {
+						return cmd.parse ('discord', this.permission (msg.member), prefix, command, args, msg)
+				 	// } else if (prefix != '') {
+					// 	return msg.channel.send (F ('invalid command: %s%s'), prefix, command)
+					// 		.then  (()=>{})
+					// 		.catch (()=>{})
+					}
 				} catch (e) {
 					console.log (F ('module `discord` message `command errored: %s - %s`', msg.content, e))
 				}

@@ -39,7 +39,7 @@ class pqCommandParser extends pqLex {
 		const realcmd = cmds [cmd] ? cmd : als [cmd]
 
 		if (!realcmd)
-			return [false, '', '', []]
+			return [false, prefix, cmd, []]
 
 		let argument = []
 		while (true) {

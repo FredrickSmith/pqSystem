@@ -42,11 +42,16 @@ class pqCommandManager {
 		this.aliases      = {}
 		this.permissions  = {}
 
+		this._category = ''
+
 		this.commandparser = new pqCommandParser ()
 	}
 
 	get commands ( ) {return this._commands    }
 	set commands (_) {       this._commands = _}
+
+	get category ( ) {return this._category    }
+	set category (_) {       this._category = _}
 
 	add (format, name, aliases = [], description, permission, funcperm, funcnoperm) {
 		if (this.commands [name]) {

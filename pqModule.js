@@ -1,21 +1,24 @@
 
 class pqModule {
-	constructor (name, module) {
+	constructor (name, file) {
 		this._n = name
-		this._m = module
+		this._f = file
+
+		this._m = ''
 	}
 
 	get name ( ) {return this._n    }
 	set name (_) {       this._n = _}
 
 	create (..._) {
-		this._m = new this._m (..._)
+		delete require.cache [require.resolve (this._f)]
+		this._m = new (require (this._f)) (..._)
 
 		return this._m
 	}
 
 	start (..._) {
-		return this._m.start ()
+		return this._m.start (..._)
 	}
 }
 
@@ -24,32 +27,73 @@ class pqModuleManager {
 		this._n = name
 
 		this._m = {}
+		this._e = {}
 	}
 
-	Module (type, name, module) {
+	Module (type, name, file) {
 		this._m [type] = this._m [type] ? this._m [type] : {}
-		this._m [type] [name] = new pqModule (name, module)
+		this._m [type] [name] = new pqModule (name, file)
 
 		return this
 	}
 
-	Start () {
-		let env     = {}
-		let modules = {}
+	Reload (type, name) {
+		let modules = this._m [type]
 
-		modules = this._m ['Base']
 		for (let module in modules) {
 			let bmodule = modules [module]
+
+			if (bmodule._n == name) {
+				bmodule.create ()
+
+				this._e [bmodule.name] = bmodule._m
+			}
+		}
+	}
+
+	ReloadAll (type) {
+		let modules = this._m [type]
+
+		for (let module in modules) {
+			let bmodule = modules [module]
+
 			bmodule.create ()
 
-			env [bmodule.name] = bmodule._m
+			this._e [bmodule.name] = bmodule._m
+		}
+	}
+
+	Start (..._) {
+		let modules
+
+		modules = this._m ['Backware']
+		for (let module in modules) {
+			module = modules [module]
+
+			module.create (..._)
+
+			this._e [module.name] = module._m
+		}
+		modules = this._m ['Middleware']
+		for (let module in modules) {
+			module = modules [module]
+			
+			module.create (..._)
+
+			this._e [module.name] = module._m
 		}
 
-		modules = this._m ['Module']
+		modules = this._m ['Frontware']
 		for (let module in modules) {
-			let mmodule = modules [module]
+			module = modules [module]
 
-			mmodule.create (env).start ()
+			module.create (this._e)
+		}
+
+		for (let module in modules) {
+			module = modules [module]
+
+			module.start (this._e, ..._)
 		}
 	}
 }
