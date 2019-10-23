@@ -1,8 +1,4 @@
 
-const fs      = require ('fs'        )
-const F       = require ('sprintf-js').sprintf
-const discord = require ('discord.js')
-
 class pqDiscord {
 	constructor (env) {
 		this._command          = env.Command
@@ -10,6 +6,10 @@ class pqDiscord {
 		this._permissionparser = env.PermissionParser
 
 		this._env = env
+
+		this._F       = env.F.sprintf
+		this._fs      = env.fs
+		this._discord = env.discord
 
 		this.permissions = this._permissionparser.loadfile ('./data/discord.permission')
 
@@ -27,7 +27,7 @@ class pqDiscord {
 	addcommands (client, resolve, reject) {
 		const command = this._command
 
-		const channeldev = fs.readFileSync ('./data/discord.devchannel')
+		const channeldev = this._fs.readFileSync ('./data/discord.devchannel')
 		let channel = client.channels.last ()
 
 		client.channels.forEach (_channel => {
@@ -43,15 +43,15 @@ class pqDiscord {
 				.catch (cth)
 		}
 		const noperm = (args, msg) => {
-			return send (F ('%s : No permission.', F ('<@%s>', msg.author.id)))
+			return send (this._F ('%s : No permission.', this._F ('<@%s>', msg.author.id)))
 		}
 
-		fs.readdir ('./discord.commands', 'utf8', (err, str) => {
+		this._fs.readdir ('./discord.commands', 'utf8', (err, str) => {
 			if (err)
 				return reject ('no commands')
 
 			str.forEach (file => {
-				const filename = F ('../discord.commands/%s', file)
+				const filename = this._F ('../discord.commands/%s', file)
 
 				delete require.cache [require.resolve (filename)]
 				try {
@@ -63,20 +63,15 @@ class pqDiscord {
 						command: command,
 						send   : send   ,
 						noperm : noperm ,
-						F      : F      ,
-						fs     : fs     ,
-
-						pqID       : this._env.Tokeniser,
-						pqSnowflake: this._env.Snowflake,
 
 						event    : this._event           ,
 						permparse: this._permissionparser,
 						pqDiscord: this                  ,
 
-						env: this._env
+						_: this._env
 					})
 				} catch (e) {
-					console.log (F ('module `discord` message `couldnt load: %s : %s`', file, e))
+					console.log (this._F ('module `discord` message `couldnt load: %s : %s`', file, e))
 				}
 			})
 		})
@@ -85,12 +80,12 @@ class pqDiscord {
 	addevents (client, resolve, reject) {
 		const command = this._command
 
-		fs.readdir ('./discord.events', 'utf8', (err, str) => {
+		this._fs.readdir ('./discord.events', 'utf8', (err, str) => {
 			if (err)
 				return reject ('no events')
 
 			str.forEach (file => {
-				const filename = F ('../discord.events/%s', file)
+				const filename = this._F ('../discord.events/%s', file)
 
 				delete require.cache [require.resolve (filename)]
 				try {
@@ -99,20 +94,15 @@ class pqDiscord {
 						resolve: resolve,
 						reject : reject ,
 						command: command,
-						F      : F      ,
-						fs     : fs     ,
-
-						pqID       : this._env.Tokeniser,
-						pqSnowflake: this._env.Snowflake,
 
 						event    : this._event           ,
 						permparse: this._permissionparser,
 						pqDiscord: this                  ,
 
-						env: this._env
+						_: this._env
 					})
 				} catch (e) {
-					console.log (F ('module `discord` message `couldnt load: %s : %s`', file, e))
+					console.log (this._F ('module `discord` message `couldnt load: %s : %s`', file, e))
 				}
 			})
 		})
@@ -120,7 +110,7 @@ class pqDiscord {
 
 	start () {
 		return new Promise ((resolve, reject) => {
-			this.dc = new discord.Client ()
+			this.dc = new this._discord.Client ()
 
 			const client = this.dc
 
@@ -131,11 +121,11 @@ class pqDiscord {
 				if (err.error.code == 'ENOTFOUND')
 					return reject ('timeout')
 				
-				return reject (F ('module `discord` message `messed up with: %s`', err.error.code))
+				return reject (this._F ('module `discord` message `messed up with: %s`', err.error.code))
 			})
 
 			client.on ('ready', () => {
-				console.log (F ('module `discord` message `ready with: %s : %s`', client.user.username, client.user.id))
+				console.log (this._F ('module `discord` message `ready with: %s : %s`', client.user.username, client.user.id))
 
 				this.addcommands (client, resolve, reject)
 				this.addevents   (client, resolve, reject)
@@ -145,7 +135,7 @@ class pqDiscord {
 				if (client.user.id == msg.author.id) return
 				if (msg.content    == ''           ) return
 
-				const txt = F ('module `discord` with `%s` in `%s` with `%s`', F ('%s#%s', msg.author.username, msg.author.discriminator), msg.guild ? msg.guild.name : 'dm', msg.content)
+				const txt = this._F ('module `discord` with `%s` in `%s` with `%s`', this._F ('%s#%s', msg.author.username, msg.author.discriminator), msg.guild ? msg.guild.name : 'dm', msg.content)
 
 				console.log (txt)
 				this._event.run ('discord:log', txt)
@@ -158,21 +148,21 @@ class pqDiscord {
 				try {
 					if (iscommand) {
 						return cmd.parse ('discord', this.permission (msg.member), prefix, command, args, msg)
-				 	// } else if (prefix != '') {
-					// 	return msg.channel.send (F ('invalid command: %s%s'), prefix, command)
-					// 		.then  (()=>{})
-					// 		.catch (()=>{})
+				 	} else if (prefix != '') {
+						return msg.channel.send (this._F ('%s: Invalid command: `%s%s`', this._F ('<@%s>', msg.author.id), prefix, command))
+							.then  (()=>{})
+							.catch (()=>{})
 					}
 				} catch (e) {
-					console.log (F ('module `discord` message `command errored: %s - %s`', msg.content, e))
+					console.log (this._F ('module `discord` message `command errored: %s - %s`', msg.content, e))
 				}
 			})
 
-			fs.readFile ('./data/discord.token', 'utf8', (err, data) => {
+			this._fs.readFile ('./data/discord.token', 'utf8', (err, data) => {
 				if (err)
 					return reject ('no token')
 
-				console.log (F ('module `discord` message `starting with: %s`', data))
+				console.log (this._F ('module `discord` message `starting with: %s`', data))
 
 				client.login (data)
 					.catch (()=>{
@@ -181,14 +171,14 @@ class pqDiscord {
 			})
 		})
 		.then (reason => {
-			console.log (F ('module `discord` message `finished good with: %s`', reason))
+			console.log (this._F ('module `discord` message `finished good with: %s`', reason))
 
 			this.dc.destroy ()
 
 			if (reason == 'reload') this.start ()
 		})
 		.catch (reason => {
-			console.log (F ('module `discord` message `finished bad with: %s`', reason))
+			console.log (this._F ('module `discord` message `finished bad with: %s`', reason))
 
 			this.dc.destroy ()
 

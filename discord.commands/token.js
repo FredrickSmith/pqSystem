@@ -1,11 +1,10 @@
 
 module.exports = (env) => {
-	const command  = env.command
-	const send     = env.send
-	const noperm   = env.noperm
-
-	const pqID        = env.pqID
-	const pqSnowFlake = env.pqSnowflake
+	const command     = env  .command
+	const send        = env  .send
+	const noperm      = env  .noperm
+	const pqID        = env._.Tokeniser
+	const pqSnowFlake = env._.Snowflake
 
 	const custom = new pqID ('hex', 1   )
 	const name   = new pqID ('hex', 2^8 )

@@ -29,4 +29,4 @@ new (require ('./pq/pqModule')) ('pq Management System')
 	.Module ('Frontware', 'Discord'   , './pqDiscord'   )
 	.Module ('Frontware', 'TeamSpeak3', './pqTeamSpeak3')
 
-	.Start ()
+	.Start ('pq Management System')

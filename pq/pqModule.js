@@ -94,16 +94,14 @@ class pqModuleManager {
 				// module.create (o [2], ((o [1] & 2) != 0) ? ((() => {return this._e}) ()) : (((o [1] & 4) != 0) ? ((..._) => {return _}) (_) : (((o [1] & 8) != 0) ? (((..._) => {return this._e, _}) (_)) : ((() => {return}) ()))))
 
 				if ((o [1] & 2) != 0) {
-					module.create (o [2], this._e)
+					this._e [module.name] = module.create (o [2], this._e)
 				} else if ((o [1] & 4) != 0) {
-					module.create (o [2], ..._)
+					this._e [module.name] = module.create (o [2], ..._)
 				} else if ((o [1] & 8) != 0) {
-					module.create (o [2], this._e, ..._)
+					this._e [module.name] = module.create (o [2], this._e, ..._)
 				} else {
-					module.create (o [2])
+					this._e [module.name] = module.create (o [2])
 				}
-
-				this._e [module.name] = module._m
 			}
 		}
 

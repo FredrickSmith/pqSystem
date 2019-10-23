@@ -1,9 +1,8 @@
 
 module.exports = (env) => {
-	const event  = env.event
-	const client = env.client
-
-	const fs      = require ('fs'        )
+	const event  = env  .event
+	const client = env  .client
+	const fs     = env._.fs
 
 	const logchannelid = fs.readFileSync ('./data/discord.logchannel')
 

@@ -1,22 +1,19 @@
 
 module.exports = (env) => {
-	const command = env.command
-	const send    = env.send
-	const noperm  = env.noperm
-	const F       = env.F
-	const fs      = env.fs
-
-	const pqID        = env.pqID
-	const pqSnowFlake = env.pqSnowflake
+	const command     = env  .command
+	const send        = env  .send
+	const noperm      = env  .noperm
+	const F           = env._.F.sprintf
+	const fs          = env._.fs
+	const crypto      = env._.crypto
+	const google      = env._.google.google
+	const googlemaps  = env._.googlemaps
+	const pqID        = env._.Tokeniser
+	const pqSnowFlake = env._.Snowflake
 
 	const token = new pqID (2^48)
 
-	const crypto = require ('crypto')
-
 	const _google = {}
-
-	const {google}   = require ('googleapis')
-	const googlemaps = require ('@google/maps')
 
 	fs.readFile ('data/google_id.oauth', 'utf8', (err, id) => {
 		if (err) return send ('no id')

@@ -1,10 +1,10 @@
 
 module.exports = (env) => {
-	const command = env.command
-	const event   = env.event
-	const send    = env.send
-	const noperm  = env.noperm
-	const F       = env.F
+	const command = env  .command
+	const event   = env  .event
+	const send    = env  .send
+	const noperm  = env  .noperm
+	const F       = env._.F.sprintf
 
 	const app  = require ('express') ()
 	const http = require ('http'   )
@@ -51,8 +51,12 @@ module.exports = (env) => {
 	)
 
 	event.add ('reload:command', 'ws:close', () => {
-		if (!(srv === undefined) && srv.listening)
-			srv.close ()
+		if (!(srv === undefined) && srv.listening) srv.close ()
+
+		srv = undefined
+	})
+	event.add ('reload:all', 'ws:close', () => {
+		if (!(srv === undefined) && srv.listening) srv.close ()
 
 		srv = undefined
 	})
