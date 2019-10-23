@@ -3,13 +3,13 @@ const fs      = require ('fs'        )
 const F       = require ('sprintf-js').sprintf
 const discord = require ('discord.js')
 
-const pqID = require ('./pqID.js')
-
 class pqDiscord {
 	constructor (env) {
 		this._command          = env.Command
 		this._event            = env.Event
 		this._permissionparser = env.PermissionParser
+
+		this._env = env
 
 		this.permissions = this._permissionparser.loadfile ('./data/discord.permission')
 
@@ -51,11 +51,11 @@ class pqDiscord {
 				return reject ('no commands')
 
 			str.forEach (file => {
-				const filename = F ('./discord.commands/%s', file)
+				const filename = F ('../discord.commands/%s', file)
 
 				delete require.cache [require.resolve (filename)]
 				try {
-					require (filename) ({ // how can better ????
+					require (filename) ({
 						client : client ,
 						channel: channel,
 						resolve: resolve,
@@ -64,12 +64,16 @@ class pqDiscord {
 						send   : send   ,
 						noperm : noperm ,
 						F      : F      ,
-						pqID   : pqID   ,
 						fs     : fs     ,
+
+						pqID       : this._env.Tokeniser,
+						pqSnowflake: this._env.Snowflake,
 
 						event    : this._event           ,
 						permparse: this._permissionparser,
 						pqDiscord: this                  ,
+
+						env: this._env
 					})
 				} catch (e) {
 					console.log (F ('module `discord` message `couldnt load: %s : %s`', file, e))
@@ -86,22 +90,26 @@ class pqDiscord {
 				return reject ('no events')
 
 			str.forEach (file => {
-				const filename = F ('./discord.events/%s', file)
+				const filename = F ('../discord.events/%s', file)
 
 				delete require.cache [require.resolve (filename)]
 				try {
-					require (filename) ({ // how can better ????
+					require (filename) ({
 						client : client ,
 						resolve: resolve,
 						reject : reject ,
 						command: command,
 						F      : F      ,
-						pqID   : pqID   ,
 						fs     : fs     ,
+
+						pqID       : this._env.Tokeniser,
+						pqSnowflake: this._env.Snowflake,
 
 						event    : this._event           ,
 						permparse: this._permissionparser,
 						pqDiscord: this                  ,
+
+						env: this._env
 					})
 				} catch (e) {
 					console.log (F ('module `discord` message `couldnt load: %s : %s`', file, e))

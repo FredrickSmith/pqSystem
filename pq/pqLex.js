@@ -48,6 +48,11 @@ class pqLex {
 
 		return tkn
 	}
+
+	finish () {
+		this.pos = 0
+		this.txt = ''
+	}
 }
 
 module.exports = pqLex

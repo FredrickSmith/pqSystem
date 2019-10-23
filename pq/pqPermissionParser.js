@@ -24,6 +24,9 @@ class pqPermissionParser extends pqLex {
 
 			this.pos++
 		}
+
+		this.finish ()
+
 		return perms
 	}
 

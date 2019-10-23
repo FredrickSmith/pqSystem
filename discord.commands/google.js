@@ -6,8 +6,11 @@ module.exports = (env) => {
 	const F       = env.F
 	const fs      = env.fs
 
-	delete require.cache [require.resolve ('../pqSnowFlake')]
-	const blizzard = new (require ('../pqSnowFlake')) ()
+	const pqID        = env.pqID
+	const pqSnowFlake = env.pqSnowflake
+
+	const token = new pqID (2^48)
+
 	const crypto = require ('crypto')
 
 	const _google = {}
@@ -49,7 +52,7 @@ module.exports = (env) => {
 	)
 	command.add ('discord', 'gsadd', ['gsa'], 'google sheets add', 16,
 		(args, msg) => {
-			let sf = blizzard.cold ().toString (16).toUpperCase ()
+			let sf = pqSnowFlake.cold ().toString (16).toUpperCase ()
 			_google.sheets.spreadsheets.values.append ({
 				auth            : _google.oa2,
 				spreadsheetId   : '1OmY6tRWHLvK9HSlKtw_NEiRo2P-2gVZ1yzPLsoB9vF0',
@@ -60,7 +63,8 @@ module.exports = (env) => {
 						[
 							sf,
 							crypto.createHash ('sha256').update (sf + '1OmY6tRWHLvK9HSlKtw_NEiRo2P-2gVZ1yzPLsoB9vF0').digest ('hex').toUpperCase (),
-							new Date ().toISOString ()
+							new Date ().toISOString (),
+							token.gen ()
 						]
 					]
 				}

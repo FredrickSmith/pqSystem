@@ -1,5 +1,3 @@
-const fs = require ('fs')
-
 const pqLex = require ('./pqLex')
 
 class pqCommandParser extends pqLex {
@@ -32,14 +30,20 @@ class pqCommandParser extends pqLex {
 		const prefix = this.lookahead (0)
 		// const prefix = this.lookaheaduntil ('', 0, (c, pos) => {if (this.prefix [c] || this.eos [c] || this.whitespace [c]) return 0}, true)
 
-		if (!this.prefix [prefix])
+		if (!this.prefix [prefix]) {
+			this.finish ()
+
 			return [false, '', '', []]
+		}
 
 		const cmd = this.lookaheaduntil ('', 1, (c, pos) => {if (this.eos [c] || this.whitespace [c]) return 0})
 		const realcmd = cmds [cmd] ? cmd : als [cmd]
 
-		if (!realcmd)
+		if (!realcmd) {
+			this.finish ()
+
 			return [false, prefix, cmd, []]
+		}
 
 		let argument = []
 		while (true) {
@@ -72,6 +76,8 @@ class pqCommandParser extends pqLex {
 
 			this.pos++
 		}
+		this.finish ()
+
 		return [true, prefix, realcmd, argument]
 	}
 }

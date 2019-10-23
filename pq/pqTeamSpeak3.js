@@ -5,6 +5,8 @@ class pqTeamSpeak3 {
 		this.__c = env.Command
 		this.__e = env.Event
 
+		this._env = env
+
 		return this
 	}
 
