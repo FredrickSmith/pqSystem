@@ -27,6 +27,7 @@ new (require ('./pq/pqModule')) ('pq Management System')
 	.Module ('Middleware', 'Database' , './pqDatabase' )
 
 	.Module ('Frontware', 'Discord'   , './pqDiscord'   )
+	// .Module ('Frontware', 'Webserver' , './pqWebserver' )
 	.Module ('Frontware', 'TeamSpeak3', './pqTeamSpeak3')
 
 	.Start ('pq Management System')

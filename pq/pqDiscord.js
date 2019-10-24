@@ -111,6 +111,7 @@ class pqDiscord {
 	start () {
 		return new Promise ((resolve, reject) => {
 			this.dc = new this._discord.Client ()
+			this.__r__ = resolve
 
 			const client = this.dc
 
@@ -121,11 +122,11 @@ class pqDiscord {
 				if (err.error.code == 'ENOTFOUND')
 					return reject ('timeout')
 				
-				return reject (this._F ('module `discord` message `messed up with: %s`', err.error.code))
+				return reject (err.error.code)
 			})
 
 			client.on ('ready', () => {
-				console.log (this._F ('module `discord` message `ready with: %s : %s`', client.user.username, client.user.id))
+				console.log (this._F ('module `discord` message `ready with: %s - %s`', client.user.username, client.user.id))
 
 				this.addcommands (client, resolve, reject)
 				this.addevents   (client, resolve, reject)
@@ -194,6 +195,11 @@ class pqDiscord {
 			if (reason == 'no events'  ) return console.log ('module `discord` message `no: discord.events'   )
 			if (reason == 'no token'   ) return console.log ('module `discord` message `no: discord.token`'   )
 		})
+	}
+
+	stop () {
+		if (this.dc)
+			this.__r__ ('stop')
 	}
 }
 

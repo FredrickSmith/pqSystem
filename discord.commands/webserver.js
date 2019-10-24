@@ -15,7 +15,7 @@ module.exports = (env) => {
 		(args, msg) => {
 			srv = http.createServer (app)
 
-			srv.on ('error', (e) => {return send (F ('port in use: `%s`', e))}) // temp for port assingment
+			srv.on ('error', (e) => {return send (F ('port in use: `%s`', e))})
 
 			srv.listen (args [0] || 0xBBBE);
 
@@ -33,7 +33,12 @@ module.exports = (env) => {
 					req.connection.remoteAddress,
 					req.connection.remotePort
 				))
+
 				return res.send ('hi')
+			})
+
+			app.get ('/req', (req, res) => {
+				return res.send ('hi?')
 			})
 
 			app.get ('/*', (_, res) => {return res.send ('hi')})

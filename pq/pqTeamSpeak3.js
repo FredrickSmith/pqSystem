@@ -44,6 +44,10 @@ class pqTeamSpeak3 {
 	// 		if (reason == 'restart' ) this.start ()
 	// 	})
 	}
+
+	stop () {
+		
+	}
 }
 
 

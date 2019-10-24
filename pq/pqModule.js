@@ -13,11 +13,13 @@ class pqModule {
 	create (bclass, ..._) {
 		delete require.cache [require.resolve (this._f)]
 
-		if (bclass) {
-			this._m = new (require (this._f)) (..._)
-		} else {
-			this._m = require (this._f)
-		}
+		try {
+			if (bclass) {
+				this._m = new (require (this._f)) (..._)
+			} else {
+				this._m = require (this._f)
+			}
+		} catch {}
 
 		return this._m
 	}
@@ -55,16 +57,40 @@ class pqModuleManager {
 		return this
 	}
 
-	Reload (type, name) {
+	Reload (type, name, bstart = false) {
 		let modules = this._m [type]
 
 		for (let module in modules) {
-			let bmodule = modules [module]
+			module = modules [module]
 
-			if (bmodule._n == name) {
-				bmodule.create ()
+			if (module._n == name)
+				this._e [module.name] = module.create ()
+		}
 
-				this._e [bmodule.name] = bmodule._m
+		if (bstart) {
+			for (let module in modules) {
+				module = modules [module]
+
+				if (module._n == name)
+					this._e [module].start (this.__e, ..._)
+			}
+		}
+	}
+
+	ReloadType (type, bstart = false) {
+		let modules = this._m [type]
+
+		for (let module in modules) {
+			module = modules [module]
+
+			this._e [module.name] = module.create ()
+		}
+
+		if (bstart) {
+			for (let module in modules) {
+				module = modules [module]
+
+				this._e [module].start (this.__e, ..._)
 			}
 		}
 	}
@@ -90,9 +116,6 @@ class pqModuleManager {
 			for (let module in modules) {
 				module = modules [module]
 
-				// possibly?
-				// module.create (o [2], ((o [1] & 2) != 0) ? ((() => {return this._e}) ()) : (((o [1] & 4) != 0) ? ((..._) => {return _}) (_) : (((o [1] & 8) != 0) ? (((..._) => {return this._e, _}) (_)) : ((() => {return}) ()))))
-
 				if ((o [1] & 2) != 0) {
 					this._e [module.name] = module.create (o [2], this._e)
 				} else if ((o [1] & 4) != 0) {
@@ -107,7 +130,9 @@ class pqModuleManager {
 
 		let modules = this._m [this._o [this.__o - 1] [0]]
 		for (let module in modules) {
-			this._e [module].start (this.__e, ..._)
+			try {
+				this._e [module].start (this.__e, ..._)
+			} catch {}
 		}
 	}
 }

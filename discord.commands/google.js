@@ -11,7 +11,8 @@ module.exports = (env) => {
 	const pqID        = env._.Tokeniser
 	const pqSnowFlake = env._.Snowflake
 
-	const token = new pqID (2^48)
+	const token = new pqID        (2^48)
+	const sf    = new pqSnowFlake (    )
 
 	const _google = {}
 
@@ -49,7 +50,7 @@ module.exports = (env) => {
 	)
 	command.add ('discord', 'gsadd', ['gsa'], 'google sheets add', 16,
 		(args, msg) => {
-			let sf = pqSnowFlake.cold ().toString (16).toUpperCase ()
+			let snowflake = sf.cold ().toString (16).toUpperCase ()
 			_google.sheets.spreadsheets.values.append ({
 				auth            : _google.oa2,
 				spreadsheetId   : '1OmY6tRWHLvK9HSlKtw_NEiRo2P-2gVZ1yzPLsoB9vF0',
@@ -58,10 +59,11 @@ module.exports = (env) => {
 				requestBody     : {
 					values: [
 						[
-							sf,
-							crypto.createHash ('sha256').update (sf + '1OmY6tRWHLvK9HSlKtw_NEiRo2P-2gVZ1yzPLsoB9vF0').digest ('hex').toUpperCase (),
+							snowflake,
+							crypto.createHash ('sha256').update (snowflake + '1OmY6tRWHLvK9HSlKtw_NEiRo2P-2gVZ1yzPLsoB9vF0').digest ('hex').toUpperCase (),
 							new Date ().toISOString (),
-							token.gen ()
+							token.gen (),
+							0
 						]
 					]
 				}
