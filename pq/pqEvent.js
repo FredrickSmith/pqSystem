@@ -57,10 +57,11 @@ class pqEventManager {
 
 			if (ec.length == 0) continue
 
-			for (let b = 0; b <= ec.length - 1; b++)
+			for (let b = 0; b <= ec.length - 1; b++) {
 				try {
 					r = ec [b].run (..._)
 				} catch (e) {}
+			}
 		}
 
 		return r

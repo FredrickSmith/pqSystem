@@ -13,13 +13,13 @@ module.exports = (env) => {
 
 	const snow = new pqSnowFlake ()
 
-	command.add ('discord', '_gn', [], '', 4, (args, msg) => {return send (name .gen ())}, noperm)
-	command.add ('discord', '_gi', [], '', 4, (args, msg) => {return send (id   .gen ())}, noperm)
-	command.add ('discord', '_gt', [], '', 4, (args, msg) => {return send (token.gen ())}, noperm)
+	command.add ('discord', '_gn', [], 'name' , 4, (args, msg) => {return send (name .gen ())}, noperm)
+	command.add ('discord', '_gi', [], 'id'   , 4, (args, msg) => {return send (id   .gen ())}, noperm)
+	command.add ('discord', '_gt', [], 'token', 4, (args, msg) => {return send (token.gen ())}, noperm)
 
-	command.add ('discord', '_gc', [], '', 4, (args, msg) => {return send (custom.gen (parseInt (args [0])))}, noperm)
+	command.add ('discord', '_gc', [], 'custom', 4, (args, msg) => {return send (custom.gen (parseInt (args [0])))}, noperm)
 
-	command.add ('discord', 'snowflake', ['Snowflake', 'snowFlake', 'SnowFlake', 'sf'], 'snowing', 4,
+	command.add ('discord', '_sf', [], 'snow', 4,
 		(args, msg) => {
 			return send (snow.cold ().toString (16).toUpperCase ())
 		}, noperm

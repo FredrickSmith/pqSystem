@@ -6,8 +6,8 @@ module.exports = (env) => {
 	const noperm  = env  .noperm
 	const F       = env._.F.sprintf
 
-	const app  = require ('express') ()
-	const http = require ('http'   )
+	const http = env._.http
+	const app  = env._.express ()
 
 	let srv
 
