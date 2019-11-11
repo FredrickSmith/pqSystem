@@ -12,10 +12,22 @@ module.exports = (env) => {
 	let cache = {}
 	let browser
 
+	command.add ('discord', 'buy', ['Buy'], '', 1, ()=>{send ('no')}, noperm)
+
 	command.add ('discord', 'c_s', [], '', 1,
 		async (args, msg) => {
 			const browser = await puppeteer.launch ({headless: false})
 			const page    = await browser.newPage ()
+
+			let t = false
+			let f = false
+
+			setTimeout (()=>{
+				if (!t) {
+					browser.close ()
+					f = true
+				}
+			}, 30000)
 
 			page.evaluateOnNewDocument (() => {
 				Object.defineProperty (navigator, 'webdriver',
@@ -25,13 +37,29 @@ module.exports = (env) => {
 				)
 			})
 
-			await page.goto (F ('https://shop.coles.com.au/online/COLRSSearchDisplay?storeId=20508&catalogId=14551&searchTerm=%s&categoryId=&tabType=everything&tabId=everything&personaliseSort=false&langId=-1&beginIndex=0&browseView=false&facetLimit=100&searchSource=Q&sType=SimpleSearch&resultCatEntryType=2&showResultsPage=true&pageView=image&errorView=AjaxActionErrorResponse&requesttype=ajax', args [0]))
+			await page.goto (F ('https://shop.coles.com.au/online/COLRSSearchDisplay?searchTerm=%s&storeId=20508&catalogId=14551&categoryId=&tabType=everything&tabId=everything&personaliseSort=false&langId=-1&beginIndex=0&browseView=false&facetLimit=100&searchSource=Q&sType=SimpleSearch&resultCatEntryType=2&showResultsPage=true&pageView=image&errorView=AjaxActionErrorResponse&requesttype=ajax', args [0]))
 
-			await page.waitForRequest ('https://shop.coles.com.au/favicon.ico')
+			await page.waitForRequest ('https://shop.coles.com.au/favicon.ico').catch (()=>{})
+
+			t = true
+
+			if (f)
+				return send ('```\ncoles\nnothing```')
 
 			let products = await page.evaluate (() => {
-				return Promise.resolve (JSON.parse (document.getElementsByClassName ('products') [0].childNodes [19].textContent))
+				let a
+				try {
+					a = JSON.parse (document.getElementsByClassName ('products') [0].childNodes [19].textContent)
+				} catch (b) {
+					a = false
+				}
+				return Promise.resolve (a)
 			})
+
+			if (!products) {
+				send ('```\ncoles\nnothing```')
+				return await browser.close ()
+			}
 
 			let s = '```\ncoles\n'
 			let c = 0
@@ -45,8 +73,8 @@ module.exports = (env) => {
 					c = 0
 				}
 
-				s += d ? F ('$%s	- %s %s	- %s	- %s\n', product.p1.o, product.m, product.n, product.a.O3, product.u2)
-				       : F ('$%s	- %s %s\n'          , product.p1.o, product.m, product.n)
+				s += d ? F ('$%s	- %s %s	- %s	- %s\n', product.p1.o || 0, product.m, product.n, product.a.O3, product.u2)
+				       : F ('$%s	- %s %s\n'             , product.p1.o || 0, product.m, product.n)
 				c += 1
 			}
 
@@ -62,8 +90,19 @@ module.exports = (env) => {
 			const browser = await puppeteer.launch ({headless: false})
 			const page    = await browser.newPage ()
 
-			await page.on ('response', async (reponse) => {
+			let t = false
+			let f = false
+
+			setTimeout (()=>{
+				if (!t) {
+					browser.close ()
+					f = true
+				}
+			}, 30000)
+
+			await page.on ('response', async reponse => {
 				if (reponse.url () === 'https://www.woolworths.com.au/apis/ui/Search/products') {
+					t = true
 					reponse.json ()
 						.then  ((a) => {
 							let s = '```\nwoolworths\n'
@@ -79,8 +118,8 @@ module.exports = (env) => {
 										c = 0
 									}
 				
-									s += d ? F ('$%s	- %s	- %s	- %s\n', product.Price, product.Description.replace ('<br>', ' '), product.PackageSize, product.CupString)
-										   : F ('$%s	- %s\n'          , product.Price, product.Description.replace ('<br>', ' '))
+									s += d ? F ('$%s	- %s	- %s	- %s\n', product.Price || 0, product.Description.replace ('<br>', ' '), product.PackageSize, product.CupString)
+										   : F ('$%s	- %s\n'                , product.Price || 0, product.Description.replace ('<br>', ' '))
 
 									c += 1
 								}
@@ -92,9 +131,12 @@ module.exports = (env) => {
 
 							browser.close ()
 						})
-						.catch (() => {})
+						.catch (() => {
+							send ('```\nwoolworths\nnothing```')
+							browser.close ()
+						})
 				}
-			})
+			}).catch (()=>{})
 
 			page.goto (F ('https://www.woolworths.com.au/shop/search/products?searchTerm=%s', args [0])).catch (()=>{})
 		}, noperm
