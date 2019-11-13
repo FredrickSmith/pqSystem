@@ -26,9 +26,10 @@ new (require ('./pq/pqModule')) ('pq Management System')
 	.Module ('Backware', 'Event'           , './pqEvent'           )
 	.Module ('Backware', 'PermissionParser', './pqPermissionParser')
 
+	.Module ('Middleware', 'Compress' , './pqCompress' )
 	.Module ('Middleware', 'Tokeniser', './pqID'       )
 	.Module ('Middleware', 'Snowflake', './pqSnowFlake')
-	.Module ('Middleware', 'Database' , './pqDatabase' )
+	// .Module ('Middleware', 'Database' , './pqDatabase' )
 
 	.Module ('Frontware', 'Discord'   , './pqDiscord'   )
 	// .Module ('Frontware', 'Webserver' , './pqWebserver' )

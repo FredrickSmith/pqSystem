@@ -7,12 +7,24 @@ module.exports = (env) => {
 	const F       = env._.F.sprintf
 
 	const puppeteer = env._.puppeteer
-	const request = env._.request
+	const discord   = env._.discord
 
-	let cache = {}
-	let browser
+	const pqCompress = env._.Compress
+
+	const compress = new pqCompress ()
 
 	command.add ('discord', 'buy', ['Buy'], '', 1, ()=>{send ('no')}, noperm)
+
+	command.add ('discord', '>', [], '', 1,
+		(args, msg) => {
+			send (F ('`%s` > `%s`', args [0], compress.encode (args [0])))
+		}, noperm
+	)
+	command.add ('discord', '<', [], '', 1,
+		(args, msg) => {
+			send (F ('`%s` > `%s`', args [0], compress.decode (args [0])))
+		}, noperm
+	)
 
 	command.add ('discord', 'c_s', [], '', 1,
 		async (args, msg) => {
@@ -27,7 +39,7 @@ module.exports = (env) => {
 					browser.close ()
 					f = true
 				}
-			}, 30000)
+			}, 15000)
 
 			page.evaluateOnNewDocument (() => {
 				Object.defineProperty (navigator, 'webdriver',
@@ -43,8 +55,10 @@ module.exports = (env) => {
 
 			t = true
 
+			let s = new discord.RichEmbed ().setColor (0xE01A22)
+
 			if (f)
-				return send ('```\ncoles\nnothing```')
+				return send (s.addField ('error', e))
 
 			let products = await page.evaluate (() => {
 				let a
@@ -57,28 +71,25 @@ module.exports = (env) => {
 			})
 
 			if (!products) {
-				send ('```\ncoles\nnothing```')
+				send (s.addField ('error', 'no products'))
 				return await browser.close ()
 			}
 
-			let s = '```\ncoles\n'
 			let c = 0
 			let d = args [1] === '1'
 
 			for (product of products.products) {
-				if (c == (d ? (args [2] ? parseInt (args [2]) : 16) : (args [2] ? parseInt (args [2]) : 32))) {
-					s += '```'
+				if (c == (d ? (args [2] ? parseInt (args [2]) : 25) : (args [2] ? parseInt (args [2]) : 25))) {
 					send (s)
-					s = '```\ncoles\n'
+					s = new discord.RichEmbed ().setColor (0xE01A22)
 					c = 0
 				}
 
-				s += d ? F ('$%s	- %s %s	- %s	- %s\n', product.p1.o || 0, product.m, product.n, product.a.O3, product.u2)
-				       : F ('$%s	- %s %s\n'             , product.p1.o || 0, product.m, product.n)
+				s.addField (compress.encode (product.s ? product.s : F ('part_%s', product.p)),
+					d ? F ('$%s	- %s %s	- %s	- %s\n', product.p1.o || 0, product.m, product.n, product.a.O3, product.u2)
+					  : F ('$%s	- %s %s\n'             , product.p1.o || 0, product.m, product.n))
 				c += 1
 			}
-
-			s += '```'
 
 			send (s)
 
@@ -91,56 +102,197 @@ module.exports = (env) => {
 			const page    = await browser.newPage ()
 
 			let t = false
-			let f = false
 
 			setTimeout (()=>{
-				if (!t) {
+				if (!t)
 					browser.close ()
-					f = true
-				}
-			}, 30000)
+			}, 15000)
 
-			await page.on ('response', async reponse => {
-				if (reponse.url () === 'https://www.woolworths.com.au/apis/ui/Search/products') {
+			await page.on ('response', async response => {
+				if (response.url () === 'https://www.woolworths.com.au/apis/ui/Search/products') {
 					t = true
-					reponse.json ()
+					let s = new discord.RichEmbed ().setColor (0x125430)
+					response.json ()
 						.then  ((a) => {
-							let s = '```\nwoolworths\n'
 							let c = 0
 							let d = args [1] === '1'
-				
+
+							if (!a.Products) {
+								send (s.addField ('error', 'no products'))
+								return browser.close ()
+							}
+
 							for (product of a.Products) {
 								for (product of product.Products) {
-									if (c == (d ? (args [2] ? parseInt (args [2]) : 16) : (args [2] ? parseInt (args [2]) : 32))) {
-										s += '```'
+									if (c == (d ? (args [2] ? parseInt (args [2]) : 25) : (args [2] ? parseInt (args [2]) : 25))) {
 										send (s)
-										s = '```\nwoolworths\n'
+										s = new discord.RichEmbed ().setColor (0x125430)
 										c = 0
 									}
-				
-									s += d ? F ('$%s	- %s	- %s	- %s\n', product.Price || 0, product.Description.replace ('<br>', ' '), product.PackageSize, product.CupString)
-										   : F ('$%s	- %s\n'                , product.Price || 0, product.Description.replace ('<br>', ' '))
+
+									let sc = product.Stockcode
+									s.addField (compress.encode (sc.length == 5 ? F ('0%s', sc) : sc),
+										d ? F ('$%s	- %s	- %s	- %s\n', product.Price || 0, product.Description.replace ('<br>', ' '), product.PackageSize, product.CupString)
+										  : F ('$%s	- %s\n'                , product.Price || 0, product.Description.replace ('<br>', ' ')))
 
 									c += 1
 								}
 							}
 				
-							s += '```'
-				
 							send (s)
 
 							browser.close ()
 						})
-						.catch (() => {
-							send ('```\nwoolworths\nnothing```')
+						.catch (e => {
+							send (s.addField ('error', e))
 							browser.close ()
 						})
 				}
-			}).catch (()=>{})
+			})
 
-			page.goto (F ('https://www.woolworths.com.au/shop/search/products?searchTerm=%s', args [0])).catch (()=>{})
+			page.goto (F ('https://www.woolworths.com.au/shop/search/products?searchTerm=%s', args [0]))
+				.catch (()=>{})
 		}, noperm
 	)
+
+	command.add ('discord', '$', [], '', 1,
+		async (args, msg)=> {
+			if (args [1] === undefined) {
+				let a = compress.decode (args [0].substring (0, 3)),
+					b = compress.decode (args [0].substring (3   ))
+
+				args [0] = a
+				args [1] = b
+			}
+
+			if (Number.isNaN (parseInt (args [0]))) {
+				args [0] = compress.decode (args [0])
+
+				if (Number.isNaN (parseInt (args [0])))
+					return send ('arg1: not number')
+			}
+
+			if (args [1].match ('undefined'))
+				return send ('arg2: incorrect')
+
+			const browser = await puppeteer.launch ({headless: false})
+
+			let c, w
+			const done = (l) => {
+				let d = l [0],
+					v = l [1]
+
+				if (d) {
+					if (c) return
+
+					c = parseFloat (v || 9999)
+				} else {
+					if (w) return
+
+					w = v || 9999
+				}
+
+				if (c && w) {
+					let sdre = new discord.RichEmbed ()
+					if (c < w) {
+						sdre.setColor  (0xE01A22)
+							.setAuthor ('Coles', 'https://shop.coles.com.au/wcsstore/ColesResponsiveStorefrontAssetStore/dist/2e9e1b85e19e5da3568c159145c5e04f/img/Icon-76@2x.png')
+							.addField  ('Woolworths', F ('$%f', w), true)
+							.addField  ('Coles'     , F ('$%f', c), true)
+					} else if (w < c) {
+						sdre.setColor  (0x125430)
+							.setAuthor ('Woolworths', 'http://logok.org/wp-content/uploads/2014/12/Woolworths-logo-880x654.png')
+							.addField  ('Woolworths', F ('$%f', w), true)
+							.addField  ('Coles'     , F ('$%f', c), true)
+					} else {
+						sdre.setColor  (0x007FFF)
+							.setAuthor ('No Winner', 'https://cdn.discordapp.com/attachments/150813303822614528/643413128251572225/emote.png')
+							.addField  ('Woolworths', F ('$%f', w), true)
+							.addField  ('Coles'     , F ('$%f', c), true)
+					}
+
+					browser.close ()
+					return send (sdre.setThumbnail (F ('https://cdn0.woolworths.media/content/wowproductimages/large/%s.jpg', args [0].length == 5 ? F ('0%s', args [0]) : args [0])))
+				}
+			}
+
+			new Promise (async resolve => {
+				const page    = await browser.newPage ()
+	
+				let t = false
+				let f = false
+	
+				setTimeout (()=>{
+					if (!t) {
+						page.close ()
+						f = true
+					}
+				}, 15000)
+	
+				let url = F ('https://www.woolworths.com.au/apis/ui/product/detail/%s?isMobile=false', args [0])
+				await page.on ('response', async response => {
+					if (response.url () === url) {
+						t = true
+						response.json ()
+							.then  ((a) => {
+								resolve ([false, a.Product.Price])
+								page.close ()
+							})
+							.catch (() => {
+								resolve ([false, false])
+								page.close ()
+							})
+					}
+				})
+	
+				page.goto (url)
+					.catch (()=>{
+						resolve ([false, false])
+					})
+			}).then (done)
+			new Promise (async resolve => {
+				const page    = await browser.newPage ()
+	
+				let t = false
+				let f = false
+	
+				setTimeout (()=>{
+					if (!t) {
+						page.close ()
+						f = true
+					}
+				}, 15000)
+
+				await page.evaluateOnNewDocument (() => {
+					Object.defineProperty (navigator, 'webdriver',
+						{
+							get: () => undefined,
+						}
+					)
+				})
+	
+				let url = F ('https://shop.coles.com.au/search/resources/store/20508/productview/bySeoUrlKeyword/%s?catalogId=14551', args [1])
+				await page.on ('response', async response => {
+					if (response.url () === url && response.status () == 200) {
+						t = true
+						response.json ()
+							.then  ((a) => {
+								resolve ([true, a.catalogEntryView [0].p1.o])
+								page.close ()
+							})
+							.catch (() => {
+								resolve ([true, false])
+								page.close ()
+							})
+					}
+				})
+	
+				page.goto (url)
+					.catch (()=>{
+						resolve ([true, false])
+					})
+			}).then (done)
+		}, noperm)
 
 	event.add ('reload:command', 'ch:close', () => {
 		if (!(browser === undefined)) browser.close ()
