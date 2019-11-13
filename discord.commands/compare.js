@@ -31,14 +31,8 @@ module.exports = (env) => {
 			const browser = await puppeteer.launch ({headless: false})
 			const page    = await browser.newPage ()
 
-			let t = false
-			let f = false
-
 			setTimeout (()=>{
-				if (!t) {
-					browser.close ()
-					f = true
-				}
+				browser.close ().catch (()=>{})
 			}, 15000)
 
 			page.evaluateOnNewDocument (() => {
@@ -53,12 +47,7 @@ module.exports = (env) => {
 
 			await page.waitForRequest ('https://shop.coles.com.au/favicon.ico').catch (()=>{})
 
-			t = true
-
 			let s = new discord.RichEmbed ().setColor (0xE01A22)
-
-			if (f)
-				return send (s.addField ('error', e))
 
 			let products = await page.evaluate (() => {
 				let a
@@ -101,16 +90,12 @@ module.exports = (env) => {
 			const browser = await puppeteer.launch ({headless: false})
 			const page    = await browser.newPage ()
 
-			let t = false
-
 			setTimeout (()=>{
-				if (!t)
-					browser.close ()
+				browser.close ().catch (()=>{})
 			}, 15000)
 
 			await page.on ('response', async response => {
 				if (response.url () === 'https://www.woolworths.com.au/apis/ui/Search/products') {
-					t = true
 					let s = new discord.RichEmbed ().setColor (0x125430)
 					response.json ()
 						.then  ((a) => {
@@ -172,10 +157,17 @@ module.exports = (env) => {
 					return send ('arg1: not number')
 			}
 
+			if (args [1].charCodeAt (0) > 1000)
+				args [1] = compress.decode (args [1])
+
 			if (args [1].match ('undefined'))
 				return send ('arg2: incorrect')
 
 			const browser = await puppeteer.launch ({headless: false})
+
+			setTimeout (()=>{
+				browser.close ().catch (()=>{})
+			}, 25000)
 
 			let c, w
 			const done = (l) => {
@@ -185,7 +177,7 @@ module.exports = (env) => {
 				if (d) {
 					if (c) return
 
-					c = parseFloat (v || 9999)
+					c = parseFloat (v) || 9999
 				} else {
 					if (w) return
 
@@ -197,13 +189,13 @@ module.exports = (env) => {
 					if (c < w) {
 						sdre.setColor  (0xE01A22)
 							.setAuthor ('Coles', 'https://shop.coles.com.au/wcsstore/ColesResponsiveStorefrontAssetStore/dist/2e9e1b85e19e5da3568c159145c5e04f/img/Icon-76@2x.png')
-							.addField  ('Woolworths', F ('$%f', w), true)
-							.addField  ('Coles'     , F ('$%f', c), true)
+							.addField  ('Woolworths', F ('$%f', w != 9999 ? w : 0), true)
+							.addField  ('Coles'     , F ('$%f', c                ), true)
 					} else if (w < c) {
 						sdre.setColor  (0x125430)
 							.setAuthor ('Woolworths', 'http://logok.org/wp-content/uploads/2014/12/Woolworths-logo-880x654.png')
-							.addField  ('Woolworths', F ('$%f', w), true)
-							.addField  ('Coles'     , F ('$%f', c), true)
+							.addField  ('Woolworths', F ('$%f', w                ), true)
+							.addField  ('Coles'     , F ('$%f', c != 9999 ? c : 0), true)
 					} else {
 						sdre.setColor  (0x007FFF)
 							.setAuthor ('No Winner', 'https://cdn.discordapp.com/attachments/150813303822614528/643413128251572225/emote.png')
@@ -217,22 +209,15 @@ module.exports = (env) => {
 			}
 
 			new Promise (async resolve => {
-				const page    = await browser.newPage ()
-	
-				let t = false
-				let f = false
+				const page = await browser.newPage ()
 	
 				setTimeout (()=>{
-					if (!t) {
-						page.close ()
-						f = true
-					}
+					page.close ().catch (()=>{})
 				}, 15000)
 	
 				let url = F ('https://www.woolworths.com.au/apis/ui/product/detail/%s?isMobile=false', args [0])
 				await page.on ('response', async response => {
 					if (response.url () === url) {
-						t = true
 						response.json ()
 							.then  ((a) => {
 								resolve ([false, a.Product.Price])
@@ -251,16 +236,10 @@ module.exports = (env) => {
 					})
 			}).then (done)
 			new Promise (async resolve => {
-				const page    = await browser.newPage ()
-	
-				let t = false
-				let f = false
-	
+				const page = await browser.newPage ()
+
 				setTimeout (()=>{
-					if (!t) {
-						page.close ()
-						f = true
-					}
+					page.close ().catch (()=>{})
 				}, 15000)
 
 				await page.evaluateOnNewDocument (() => {
@@ -274,7 +253,6 @@ module.exports = (env) => {
 				let url = F ('https://shop.coles.com.au/search/resources/store/20508/productview/bySeoUrlKeyword/%s?catalogId=14551', args [1])
 				await page.on ('response', async response => {
 					if (response.url () === url && response.status () == 200) {
-						t = true
 						response.json ()
 							.then  ((a) => {
 								resolve ([true, a.catalogEntryView [0].p1.o])
