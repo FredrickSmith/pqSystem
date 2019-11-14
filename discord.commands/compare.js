@@ -13,25 +13,12 @@ module.exports = (env) => {
 
 	const compress = new pqCompress ()
 
-	command.add ('discord', 'buy', ['Buy'], '', 1, ()=>{send ('no')}, noperm)
-
-	command.add ('discord', '>', [], '', 1,
-		(args, msg) => {
-			send (F ('`%s` > `%s`', args [0], compress.encode (args [0])))
-		}, noperm
-	)
-	command.add ('discord', '<', [], '', 1,
-		(args, msg) => {
-			send (F ('`%s` > `%s`', args [0], compress.decode (args [0])))
-		}, noperm
-	)
-
-	command.add ('discord', 'c_s', [], '', 1,
+	command.add ('discord', '$c', [], 'search for coles products', 1,
 		async (args, msg) => {
 			const browser = await puppeteer.launch ({headless: false})
 			const page    = await browser.newPage ()
 
-			setTimeout (()=>{
+			const _ = setTimeout (()=>{
 				browser.close ().catch (()=>{})
 			}, 15000)
 
@@ -57,11 +44,12 @@ module.exports = (env) => {
 					a = false
 				}
 				return Promise.resolve (a)
-			})
+			}).catch (()=>{})
 
 			if (!products) {
 				send (s.addField ('error', 'no products'))
-				return await browser.close ()
+				clearTimeout (_)
+				return browser.close ()
 			}
 
 			let c = 0
@@ -81,16 +69,16 @@ module.exports = (env) => {
 			}
 
 			send (s)
-
+			clearTimeout (_)
 			await browser.close ()
 		}, noperm
 	)
-	command.add ('discord', 'w_s', [], '', 1,
+	command.add ('discord', '$w', [], 'search for woolworths products', 1,
 		async (args, msg) => {
 			const browser = await puppeteer.launch ({headless: false})
 			const page    = await browser.newPage ()
 
-			setTimeout (()=>{
+			const _ = setTimeout (()=>{
 				browser.close ().catch (()=>{})
 			}, 15000)
 
@@ -125,11 +113,12 @@ module.exports = (env) => {
 							}
 				
 							send (s)
-
+							clearTimeout (_)
 							browser.close ()
 						})
 						.catch (e => {
 							send (s.addField ('error', e))
+							clearTimeout (_)
 							browser.close ()
 						})
 				}
@@ -140,7 +129,7 @@ module.exports = (env) => {
 		}, noperm
 	)
 
-	command.add ('discord', '$', [], '', 1,
+	command.add ('discord', '$', [], 'compare a woolworths product to a coles product', 1,
 		async (args, msg)=> {
 			if (args [1] === undefined) {
 				let a = compress.decode (args [0].substring (0, 3)),
@@ -165,7 +154,7 @@ module.exports = (env) => {
 
 			const browser = await puppeteer.launch ({headless: false})
 
-			setTimeout (()=>{
+			const __ = setTimeout (()=>{
 				browser.close ().catch (()=>{})
 			}, 25000)
 
@@ -203,6 +192,7 @@ module.exports = (env) => {
 							.addField  ('Coles'     , F ('$%f', c), true)
 					}
 
+					clearTimeout (__)
 					browser.close ()
 					return send (sdre.setThumbnail (F ('https://cdn0.woolworths.media/content/wowproductimages/large/%s.jpg', args [0].length == 5 ? F ('0%s', args [0]) : args [0])))
 				}
@@ -211,7 +201,7 @@ module.exports = (env) => {
 			new Promise (async resolve => {
 				const page = await browser.newPage ()
 	
-				setTimeout (()=>{
+				const _ = setTimeout (()=>{
 					page.close ().catch (()=>{})
 				}, 15000)
 	
@@ -221,11 +211,13 @@ module.exports = (env) => {
 						response.json ()
 							.then  ((a) => {
 								resolve ([false, a.Product.Price])
-								page.close ()
+								clearTimeout (_)
+								page.close ().catch (()=>{})
 							})
 							.catch (() => {
 								resolve ([false, false])
-								page.close ()
+								clearTimeout (_)
+								page.close ().catch (()=>{})
 							})
 					}
 				})
@@ -233,12 +225,13 @@ module.exports = (env) => {
 				page.goto (url)
 					.catch (()=>{
 						resolve ([false, false])
+						clearTimeout (_)
 					})
 			}).then (done)
 			new Promise (async resolve => {
 				const page = await browser.newPage ()
 
-				setTimeout (()=>{
+				const _ = setTimeout (()=>{
 					page.close ().catch (()=>{})
 				}, 15000)
 
@@ -256,11 +249,13 @@ module.exports = (env) => {
 						response.json ()
 							.then  ((a) => {
 								resolve ([true, a.catalogEntryView [0].p1.o])
-								page.close ()
+								clearTimeout (_)
+								page.close ().catch (()=>{})
 							})
 							.catch (() => {
 								resolve ([true, false])
-								page.close ()
+								clearTimeout (_)
+								page.close ().catch (()=>{})
 							})
 					}
 				})
@@ -268,18 +263,9 @@ module.exports = (env) => {
 				page.goto (url)
 					.catch (()=>{
 						resolve ([true, false])
+						clearTimeout (_)
 					})
 			}).then (done)
-		}, noperm)
-
-	event.add ('reload:command', 'ch:close', () => {
-		if (!(browser === undefined)) browser.close ()
-
-		browser = undefined
-	})
-	event.add ('reload:all', 'ch:close', () => {
-		if (!(browser === undefined)) browser.close ()
-
-		browser = undefined
-	})
+		}, noperm
+	)
 }
