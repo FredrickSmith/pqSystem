@@ -176,7 +176,8 @@ class pqDiscord {
 
 			this.dc.destroy ()
 
-			if (reason == 'reload') this.start ()
+			if (reason == 'reload') return this.start ()
+			if (reason == 'stop'  ) return console.log ('module `discord` message `stop`')
 		})
 		.catch (reason => {
 			console.log (this._F ('module `discord` message `finished bad with: %s`', reason))

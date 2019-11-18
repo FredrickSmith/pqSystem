@@ -60,7 +60,9 @@ class pqEventManager {
 			for (let b = 0; b <= ec.length - 1; b++) {
 				try {
 					r = ec [b].run (..._)
-				} catch (e) {}
+				} catch (e) {
+					console.log ('event error', e)
+				}
 			}
 		}
 
