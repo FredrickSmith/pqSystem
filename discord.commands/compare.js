@@ -7,13 +7,11 @@ module.exports = (env) => {
 	const pqBrowser  = env._.Browser
 	const pqCommand  = env._.Command
 	const discord    = env._.discord
-	const pqDatabase = env._.Database
 	const pqCompress = env._.Compress
 	const htmlparser = env._.htmlparser
 
 	const browser  = new pqBrowser  ()
 	const compress = new pqCompress ()
-	const db       = new pqDatabase ()
 
 	command.add ('discord', '$?', [], 'search both coles and woolworths', 1,
 		(args, msg) => {

@@ -21,10 +21,4 @@ module.exports = (env) => {
 			return send (str)
 		}, noperm
 	)
-
-	command.add ('discord', 'd2?', [], 'conversion from dec/hex/bin to dec/hex/bin', 1,
-		(args, msg) => {
-			return send (parseInt(args [0], args [2] || 10).toString (parseInt (args [1])))
-		}, noperm
-	)
 }

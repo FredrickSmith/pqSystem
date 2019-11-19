@@ -42,7 +42,7 @@ class pqJWT {
 		payload.iat = Date.now ()
 		payload.exp = payload.iat + 2419200000
 
-		const header    = this.estring64 ({alg: 'pq'})
+		const header    = this.estring64 ({alg: 'RS512'})
 		      payload   = this.estring64 (payload)
 		const signature = this.ebase64   (this._sign (header + '.' + payload))
 
