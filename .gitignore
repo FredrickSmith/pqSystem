@@ -1,12 +1,10 @@
-link.js
-google.js
-webserver.js
-
 .vscode
 
 node_modules
 
 data
+
+old
 
 permission.txt
 snowflake.txt
