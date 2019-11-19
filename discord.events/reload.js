@@ -11,14 +11,15 @@ module.exports = (env) => {
 
 	event.add ('reload:permission', 'reload:permission', () => {
 		discord.permissions = permparse.loadfile ('./data/discord.permission')
-	})
+	}, 0)
 	event.add ('reload:command'   , 'reload:command', () => {
+		console.log ('??')
 		discord.addcommands (client, resolve, reject)
-	})
+	}, 0)
 	event.add ('reload:event', 'reload:event', () => {
 		discord.addevents (client, resolve, reject)
-	})
+	}, 0)
 	event.add ('reload:module', 'reload:module', () => {
 		module.ReloadType ('Middleware')
-	})
+	}, 0)
 }

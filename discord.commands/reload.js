@@ -1,10 +1,10 @@
 
 module.exports = (env) => {
-	const resolve   = env.resolve
-	const command   = env.command
-	const event     = env.event
-	const send      = env.send
-	const noperm    = env.noperm
+	const send    = env.send
+	const event   = env.event
+	const noperm  = env.noperm
+	const resolve = env.resolve
+	const command = env.command
 
 	const kill = () => {process.exit ()}
 	const done = () => {resolve ('reload')}

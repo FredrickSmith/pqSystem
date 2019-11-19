@@ -51,7 +51,6 @@ class pqEventManager {
 		if (!ea) return
 
 		let r
-
 		for (let a = 0; a <= 4; a++) {
 			const ec = ea [a]
 

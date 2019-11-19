@@ -1,8 +1,7 @@
 
 module.exports = (env) => {
-	const command = env  .command
-	const send    = env  .send
 	const noperm  = env  .noperm
+	const command = env  .command
 	const pqID    = env._.Tokeniser
 
 	const id = new pqID ('chinese', 2^64)

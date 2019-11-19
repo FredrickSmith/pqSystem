@@ -1,8 +1,8 @@
 
 module.exports = (env) => {
-	const command = env  .command
 	const send    = env  .send
 	const noperm  = env  .noperm
+	const command = env  .command
 	const F       = env._.F.sprintf
 
 	send ('started')

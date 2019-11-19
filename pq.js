@@ -27,6 +27,7 @@ new (require ('./pq/pqModule')) ('pq Management System')
 	.Module ('Backware', 'Event'           , './pqEvent'           )
 	.Module ('Backware', 'PermissionParser', './pqPermissionParser')
 
+	.Module ('Middleware', 'JWT'      , './pqJWT'      )
 	.Module ('Middleware', 'Browser'  , './pqBrowser'  )
 	.Module ('Middleware', 'Database' , './pqDatabase' )
 	.Module ('Middleware', 'Compress' , './pqCompress' )

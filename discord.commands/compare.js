@@ -1,22 +1,19 @@
 
 module.exports = (env) => {
-	const command = env  .command
-	const event   = env  .event
-	const send    = env  .send
-	const noperm  = env  .noperm
-	const F       = env._.F.sprintf
-
-	const discord    = env._.discord
-	const htmlparser = env._.htmlparser
-
-	const pqCommand  = env._.Command
+	const send       = env  .send
+	const noperm     = env  .noperm
+	const command    = env  .command
+	const F          = env._.F         .sprintf
 	const pqBrowser  = env._.Browser
+	const pqCommand  = env._.Command
+	const discord    = env._.discord
+	const pqDatabase = env._.Database
 	const pqCompress = env._.Compress
-	// const pqDatabase = env._.Database
+	const htmlparser = env._.htmlparser
 
 	const browser  = new pqBrowser  ()
 	const compress = new pqCompress ()
-	// const db       = new pqDatabase ()
+	const db       = new pqDatabase ()
 
 	command.add ('discord', '$?', [], 'search both coles and woolworths', 1,
 		(args, msg) => {

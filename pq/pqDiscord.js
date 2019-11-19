@@ -136,7 +136,7 @@ class pqDiscord {
 				if (client.user.id == msg.author.id) return
 				if (msg.content    == ''           ) return
 
-				const txt = this._F ('module `discord` with `%s` in `%s` with `%s`', this._F ('%s#%s', msg.author.username, msg.author.discriminator), msg.guild ? msg.guild.name : 'dm', msg.content)
+				const txt = this._F ('module `discord` with `%s` in `%s` with `%s`', this._F ('%s#%s', msg.author.username, msg.author.discriminator), msg.guild ? msg.guild.name : 'dm', msg.content.substr (0, 61))
 
 				console.log (txt)
 				this._event.run ('discord:log', txt)
@@ -155,7 +155,7 @@ class pqDiscord {
 							.catch (()=>{})
 					}
 				} catch (e) {
-					console.log (this._F ('module `discord` message `command errored: %s - %s`', msg.content, e))
+					console.log (this._F ('module `discord` message `command errored: %s - %s`', msg.content.substr (0, 61), e))
 				}
 			})
 

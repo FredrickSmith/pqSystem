@@ -3,13 +3,13 @@ module.exports = (env) => {
 	const command     = env  .command
 	const send        = env  .send
 	const noperm      = env  .noperm
-	const F           = env._.F.sprintf
+	const F           = env._.F         .sprintf
 	const fs          = env._.fs
 	const crypto      = env._.crypto
-	const google      = env._.google.google
-	const googlemaps  = env._.googlemaps
+	const google      = env._.google    .google
 	const pqID        = env._.Tokeniser
 	const pqSnowFlake = env._.Snowflake
+	const googlemaps  = env._.googlemaps
 
 	const token = new pqID        (2^48)
 	const sf    = new pqSnowFlake (    )
